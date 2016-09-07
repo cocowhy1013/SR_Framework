@@ -23,7 +23,7 @@ public class LogResultAnalyzer {
 
             File root = new File(rootName[i]);
             for (File f : root.listFiles()) {
-                if (f.getName().contains("result") && f.getName().endsWith(".txt")) {
+                if (f.getName().startsWith("result") && f.getName().endsWith(".txt")) {
                     resultFileProcessor(f);
                 }
             }
@@ -31,29 +31,44 @@ public class LogResultAnalyzer {
     }
     public void resultFileProcessor(File file) throws IOException {
         File target = new File(result_CSV);
+        System.out.println(file.getPath());
 
         String fileNumber = file.getName().
                 replace("result", "").replace(".txt", "");
 
+        String r_type = "";
         List<String> lineList = FileUtils.readLines(file);
         for(int i=0;i<lineList.size();i++){
             String line = lineList.get(i);
             System.out.println(line);
             String[] part  = line.split(" |:");
+
+
             //System.out.println(part[0]+"-"+part[1]+"-"+part[2]+"-"+part[3]);
             //System.out.println(part.length);
             if(part.length==6) {
-                FileUtils.writeStringToFile(target, fileNumber+",", true);
-                FileUtils.writeStringToFile(target, part[1] + ",", true);
-                FileUtils.writeStringToFile(target, part[3] + ",", true);
-                FileUtils.writeStringToFile(target, part[5], true);
+                if(part[1].equals(r_type)){
+                    FileUtils.writeStringToFile(target, part[5]+",", true);
+                }
+                else {
+                    //if(!r_type.isEmpty())
+                    FileUtils.writeStringToFile(target, "\n", true);
+                    FileUtils.writeStringToFile(target, fileNumber+",", true);
+                    FileUtils.writeStringToFile(target, part[1] + ",", true);
+                    FileUtils.writeStringToFile(target, part[3] + ",", true);
+                    FileUtils.writeStringToFile(target, part[5]+",", true);
+                    r_type = part[1];
+
+                }
+
+
             }
-            FileUtils.writeStringToFile(target, "\n", true);
         }
     }
     public static void main(String [] args) throws IOException {
-        String[] rootList = {"E:\\MT1\\wekaRunner\\FileTest","E:\\MT1\\wekaRunner\\FileTest1"};
-        LogResultAnalyzer analyzer = new LogResultAnalyzer("E:\\MT1\\wekaRunner\\FileTest\\final.txt"
+        String[] rootList = {"E:\\MT1\\FileTest","E:\\MT1\\FileTest2","E:\\MT1\\FileTest3",
+                "E:\\MT1\\FileTest4","E:\\MT1\\FileTest5"};
+        LogResultAnalyzer analyzer = new LogResultAnalyzer("E:\\MT1\\final.txt"
         ,rootList);
        analyzer.rootProcessor();
        //analyzer.resultFileProcessor("E:\\MT1\\wekaRunner\\FileTest\\result1.txt");

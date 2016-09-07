@@ -1,4 +1,7 @@
+import org.apache.commons.io.FileUtils;
+
 import java.io.File;
+import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -141,16 +144,32 @@ public class MutantGetter {
         }
 
     }
+    public void replaceClassFile(String sourcePath, String targetPath) throws IOException {
+        File file = new File(targetPath);
+        if(file.exists())
+            FileUtils.forceDelete(file);
 
-    public static void main(String[] args) {
+        FileUtils.copyFile(new File(sourcePath),new File(targetPath));
+    }
+
+    public static void main(String[] args) throws IOException {
+
+        String mutantRoot = args[0];//"E:\\Mutation\\result\\weka.classifiers.trees.J48";
+        int mutantNumber = Integer.parseInt(args[1]);//"1");
+        String originFile = args[2];//"E:\\MT\\J48.class";
         MutantGetter m = new MutantGetter();
-        m.getMutantsClass("E:/Mutation/result/weka.classifiers.bayes.NaiveBayes");
+        m.getMutantsClass(mutantRoot);
         Map<String, String> map = m.get_allpath();
-        for (Map.Entry<String, String> entry : map.entrySet()) {
+        /*for (Map.Entry<String, String> entry : map.entrySet()) {
             System.out.println("!key= " + entry.getKey() + " and value= "+ entry.getValue());
-        }
-        System.out.println(map.size());
-        System.out.println(m.returnSpecificClassPath(2));
+        }*/
+        //System.out.println(map.size());
+        //System.out.println(map.size());
+        //System.out.println(m.returnSpecificClassPath(2));
+
+        if(mutantNumber<map.size())
+            m.replaceClassFile(m.returnSpecificClassPath(mutantNumber),originFile);
+
     }
 
 }
