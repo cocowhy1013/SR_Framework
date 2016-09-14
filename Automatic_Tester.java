@@ -1,4 +1,3 @@
-import DecisionTree.J48weka_Processor;
 import org.apache.commons.io.FileUtils;
 
 import java.io.File;
@@ -19,19 +18,40 @@ public abstract class Automatic_Tester {
     private int score_Test;
     private int[] analyzerResult;
     private int labelRange = 10;
-    final double[] slot = {-1,-0.7,-0.3,0.3,0.7,1.0};
+    final double[] slot = {-1,-0.5,-0.25,0.25,0.5,1.0};
+    private double maxScore;
+    private double minScore;
 
+    public double getMaxScore(){
+        return maxScore;
+    }
+    public double getMinScore(){
+        return minScore;
+    }
+
+    public boolean isGeneratable(){
+        if(minScore<slot[3])
+            return true;
+        else return false;
+    }
     public int[] read_Train_Data(String trainFilePath) throws IOException {
         List<String> lines= FileUtils.readLines(new File(trainFilePath));
         score_List = new ArrayList<Double>();
+        int flag = 0;
         for(int i=0;i<lines.size();i++){
             if(lines.get(i).contains("@")||lines.get(i).isEmpty())
                 continue;
+            if(flag == 0){
+                maxScore = generateMaxInstanceScore(lines.get(i));
+                minScore = generateMinInstanceScore(lines.get(i));
+                flag = 1;
+            }
             double score = caculateScore(lines.get(i));
             //System.out.println(score);
             score_List.add(score);
 
         }
+
         return analyzer_Score_List();
     }
 
@@ -109,9 +129,9 @@ public abstract class Automatic_Tester {
             int negative_Sum = analyzerResult[0];
             int[] modify_instance_Array;
             if(modify_strength<negative_Sum)
-                modify_instance_Array = J48weka_Processor.array_Random(modify_strength,negative_Sum);
+                modify_instance_Array = array_Random(modify_strength, negative_Sum);
             else
-                modify_instance_Array = J48weka_Processor.array_Random(negative_Sum,negative_Sum);
+                modify_instance_Array = array_Random(negative_Sum,negative_Sum);
             //Arrays.sort(modify_instance_Array);
             int number = -1;
             for(int i=0;i<lines.size();i++) {
@@ -130,9 +150,9 @@ public abstract class Automatic_Tester {
             int negative_Sum = analyzerResult[1];
             int[] modify_instance_Array;
             if(modify_strength<negative_Sum)
-                modify_instance_Array = J48weka_Processor.array_Random(modify_strength,negative_Sum);
+                modify_instance_Array = array_Random(modify_strength, negative_Sum);
             else
-                modify_instance_Array = J48weka_Processor.array_Random(negative_Sum,negative_Sum);
+                modify_instance_Array = array_Random(negative_Sum, negative_Sum);
             //Arrays.sort(modify_instance_Array);
             int number = -1;
             for(int i=0;i<lines.size();i++) {
@@ -147,11 +167,16 @@ public abstract class Automatic_Tester {
                 }
             }
         }
-        FileUtils.writeLines(new File(trainFilePath.replace(".arff","_after1.arff")),lines,false);
+        FileUtils.writeLines(new File(trainFilePath.replace(".arff","_after.arff")),lines,false);
     }
-    public abstract double caculateScore(String line);
+    protected abstract double caculateScore(String line);
 
     protected abstract String modifyLine(String s, int modify_type);
+
+    protected abstract double generateMaxInstanceScore(String line);
+
+    protected abstract double generateMinInstanceScore(String line);
+
 
     public boolean isExist(int[] array, int value){
         for(int i=0;i<array.length;i++){
@@ -162,7 +187,6 @@ public abstract class Automatic_Tester {
     }
     public static void main(String[] args) throws IOException {
         Automatic_Tester tester;
-
     }
 
 }

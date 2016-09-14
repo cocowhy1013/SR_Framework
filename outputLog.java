@@ -2,7 +2,6 @@ import org.apache.commons.io.FileUtils;
 
 import java.io.File;
 import java.io.IOException;
-import java.util.Arrays;
 
 /**
  * Created by Coco on 2016/8/25.
@@ -28,7 +27,7 @@ call log.bat
 
 java -Djava.ext.dirs=E:\MT\wekaRunner\lib Analyzer E:\\MT1\\wekaRunner\\FileTest > result1.txt
     * */
-    public static void main(String [] args) throws IOException {
+    /*public static void main(String [] args) throws IOException {
         File file = new File("E:\\MT1\\RunMutant5.bat");
 
         FileUtils.writeStringToFile(file,"",false);
@@ -56,6 +55,34 @@ java -Djava.ext.dirs=E:\MT\wekaRunner\lib Analyzer E:\\MT1\\wekaRunner\\FileTest
                 FileUtils.writeStringToFile(file, "java -Djava.ext.dirs=E:\\MT\\wekaRunner\\lib Analyzer E:\\\\MT1\\\\MutantTest5 > result_"+mutantNumber+"_" + i + ".txt\n", true);
                 FileUtils.writeStringToFile(file, "\n\n", true);
             }
+        }
+    }*/
+
+    public static void main(String[] args) throws IOException {
+        String rootpath = args[0];
+        int testNumberFrom = Integer.parseInt(args[1]);
+        int testNumberTo = Integer.parseInt(args[2]);
+
+        File file = new File(args[3]);
+        FileUtils.writeStringToFile(file,"",false);
+        for(int i=testNumberFrom;i<testNumberTo;i++){
+            FileUtils.writeStringToFile(file, "javac -Djava.ext.dirs=E:\\MT\\wekaRunner\\lib DeleteRepo.java\n", true);
+            FileUtils.writeStringToFile(file, "java -Djava.ext.dirs=E:\\MT\\wekaRunner\\lib DeleteRepo "+rootpath+"\n", true);
+
+            FileUtils.writeStringToFile(file, "javac -Djava.ext.dirs=E:\\MT\\wekaRunner\\lib weka\\classifiers\\trees\\J48.java\n", true);
+            FileUtils.writeStringToFile(file, "java -Djava.ext.dirs=E:\\MT\\wekaRunner\\lib weka.classifiers.trees.J48 -C 0.25 -M 3 -t 20trainAll.arff -d model.model > tree.txt\n", true);
+            FileUtils.writeStringToFile(file, "java -Djava.ext.dirs=E:\\MT\\wekaRunner\\lib weka.classifiers.trees.J48 -p 10 -l model.model -T 20testAll.arff > predict.txt\n", true);
+
+            FileUtils.writeStringToFile(file, "javac -Djava.ext.dirs=E:\\MT\\wekaRunner\\lib RetriveTreePathForTest.java\n", true);
+            FileUtils.writeStringToFile(file, "javac -Djava.ext.dirs=E:\\MT\\wekaRunner\\lib Automatic_Tester.java\n", true);
+
+            FileUtils.writeStringToFile(file, "javac -Djava.ext.dirs=E:\\MT\\wekaRunner\\lib TreeNodeExpression.java\n", true);
+            FileUtils.writeStringToFile(file, "java -Djava.ext.dirs=E:\\MT\\wekaRunner\\lib -Xms100m -Xmx512m RetriveTreePathForTest 20trainAll.arff 20testAll.arff tree.txt "+i+" -1 -1 log.bat\n", true);
+
+            FileUtils.writeStringToFile(file, "call log.bat\n", true);
+            FileUtils.writeStringToFile(file, "javac -Djava.ext.dirs=E:\\MT\\wekaRunner\\lib Analyzer.java\n", true);
+            FileUtils.writeStringToFile(file, "java -Djava.ext.dirs=E:\\MT\\wekaRunner\\lib -Xms100m -Xmx512m Analyzer "+rootpath+" > result"+i+".txt\n", true);
+            FileUtils.writeStringToFile(file, "\n\n", true);
         }
     }
 }
