@@ -40,6 +40,10 @@ java -Djava.ext.dirs=E:\MT\wekaRunner\lib Analyzer E:\\MT1\\wekaRunner\\FileTest
                 FileUtils.writeStringToFile(file, "java -Djava.ext.dirs=E:\\MT\\wekaRunner\\lib DeleteRepo E:\\MT1\\MutantTest5\n", true);
 
                 FileUtils.writeStringToFile(file, "javac -Djava.ext.dirs=E:\\MT\\wekaRunner\\lib weka\\classifiers\\trees\\J48.java\n", true);
+
+                FileUtils.writeStringToFile(file, "javac -Djava.ext.dirs=E:\\MT\\wekaRunner\\lib ReplaceOriginWithMutant.java\n");
+                FileUtils.writeStringToFile(file, "java -Djava.ext.dirs=E:\\MT\\wekaRunner\\lib ReplaceOriginWithMutant weka\\classifiers\\trees\\J48.java -1\n");
+
                 FileUtils.writeStringToFile(file, "javac -Djava.ext.dirs=E:\\MT\\wekaRunner\\lib MutantGetter.java\n", true);
                 FileUtils.writeStringToFile(file, "java -Djava.ext.dirs=E:\\MT\\wekaRunner\\lib MutantGetter E:\\Mutation\\result\\weka.classifiers.trees.J48 "+mutantNumber+" weka\\classifiers\\trees\\J48.class\n", true);
 

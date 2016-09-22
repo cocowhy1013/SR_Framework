@@ -33,6 +33,8 @@ public class LogResultAnalyzer {
         File target = new File(result_CSV);
         System.out.println(file.getPath());
 
+        if(!file.getName().contains("result"))
+            return;
         String fileNumber = file.getName().
                 replace("result", "").replace(".txt", "");
 
@@ -40,7 +42,7 @@ public class LogResultAnalyzer {
         List<String> lineList = FileUtils.readLines(file);
         for(int i=0;i<lineList.size();i++){
             String line = lineList.get(i);
-            System.out.println(line);
+            //System.out.println(line);
             String[] part  = line.split(" |:");
 
 
@@ -66,9 +68,8 @@ public class LogResultAnalyzer {
         }
     }
     public static void main(String [] args) throws IOException {
-        String[] rootList = {"E:\\MT1\\FileTest","E:\\MT1\\FileTest2","E:\\MT1\\FileTest3",
-                "E:\\MT1\\FileTest4","E:\\MT1\\FileTest5"};
-        LogResultAnalyzer analyzer = new LogResultAnalyzer("E:\\MT1\\final.txt"
+        String[] rootList = {"E:\\MT1\\Result\\Threshold=0.2"};
+        LogResultAnalyzer analyzer = new LogResultAnalyzer("E:\\MT1\\Result\\final.txt"
         ,rootList);
        analyzer.rootProcessor();
        //analyzer.resultFileProcessor("E:\\MT1\\wekaRunner\\FileTest\\result1.txt");

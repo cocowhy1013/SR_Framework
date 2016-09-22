@@ -80,7 +80,6 @@ public class RetriveTreePathForTest extends Automatic_Tester {
                                 line.charAt(start.length()) < '0')
                             continue;
                         TreeNodeExpression nodeExpression = getNodeFromLine(line);
-
                         if(nodeExpression.operator.equals("<")){
                             if(parts_Test[Integer.parseInt(nodeExpression.attributeName)]<
                                     Integer.parseInt(nodeExpression.valueSplit)) {
@@ -138,20 +137,18 @@ public class RetriveTreePathForTest extends Automatic_Tester {
                         continue;
                     if (treelines.get(j).contains("Number of Leaves"))
                         break;
-
                     }
                 }
         }
-
         predict_Array = Integer.parseInt(pathNodeList.get(pathNodeList.size()-1).label);
 
-        System.out.println("predict:"+predict_Array);
+        //System.out.println("predict:"+predict_Array);
         return pathNodeList;
     }
 
     public void displayList(ArrayList<TreeNodeExpression> treeNodeList){
         for(int i=0;i<treeNodeList.size();i++){
-            System.out.println();
+            //System.out.println();
             treeNodeList.get(i).display();
         }
     }
@@ -281,7 +278,7 @@ public class RetriveTreePathForTest extends Automatic_Tester {
             resultLine = generateMinInstance(parts);
             resultLine = modifyLine(resultLine,0);
         }
-        System.out.println(trainLine+"--->"+resultLine);
+        //System.out.println(trainLine+"--->"+resultLine);
         return resultLine;
     }
     public String modifyLineSolver(ArrayList<TreeNodeExpression> conditionList){
@@ -293,19 +290,22 @@ public class RetriveTreePathForTest extends Automatic_Tester {
         String testFile = "E:\\MT1\\MutantTest3\\20testAll.arff";
         String treeFile = "E:\\MT1\\MutantTest3\\tree.txt";
 
-        int testNumber = 5;
-        int modify_type = 1;
-        int modify_strength = 50;
+        int testNumber = 1;
+        //int modify_type = 1;
+        //int modify_strength = 50;
 
-        RetriveTreePathForTest retriver = new RetriveTreePathForTest(trainFile,testFile,treeFile);
-        //System.out.println(retriver.getTest(4));
-        retriver.displayList(retriver.getPathList(testNumber));
+        for(int i=testNumber;i<=200;i++) {
+            RetriveTreePathForTest retriver = new RetriveTreePathForTest(trainFile, testFile, treeFile);
+            //System.out.println(retriver.getTest(4));
+            //retriver.displayList();
+            System.out.println("=====testNumber:"+i);
+            retriver.getPathList(i);
+            //System.out.println();
+            //System.out.println("Score"+retriver.caculateScore("0,9,9,0,0,0,9,0,0,1"));
 
-        //System.out.println();
-        //System.out.println("Score"+retriver.caculateScore("0,9,9,0,0,0,9,0,0,1"));
-
-        retriver.read_Train_Data(trainFile);
-        retriver.modifyFile(trainFile,modify_type,modify_strength);
+            retriver.read_Train_Data(trainFile);
+        }
+        //retriver.modifyFile(trainFile,modify_type,modify_strength);
         //retriver.read_Train_Data("E:\\MT1\\MutantTest3\\20trainAll_after1.arff");
 
     }

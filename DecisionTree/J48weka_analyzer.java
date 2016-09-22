@@ -49,9 +49,8 @@ public class J48weka_analyzer {
     }
 
     public static void main(String []args) throws IOException {
-        //int i = new J48weka_analyzer().returnPredictValue("E:\\MT1\\" +
-        //        "wekaRunner\\predict_5_5_31.txt");
-        //System.out.println(i);
-        new J48weka_analyzer().returnRootAnalyze(args[0]);
+        int i = new J48weka_analyzer().returnPredictValue("E:\\MT1\\OriginTest\\5\\predict_5_0_0.txt");
+        System.out.println(i);
+        //new J48weka_analyzer().returnRootAnalyze(args[0]);
     }
 }

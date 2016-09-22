@@ -18,18 +18,25 @@ public class ReplaceOriginWithMuntant {
     }
     public static void main(String [] args) throws IOException {
 
-        MutantGetter m = new MutantGetter();
-        m.getMutantsClass("E:\\Mutation\\result\\weka.classifiers.trees.J48");
-        Map<String, String> map = m.get_allpath();
-        for (Map.Entry<String, String> entry : map.entrySet()) {
-            System.out.println("!key= " + entry.getKey() + " and value= "+ entry.getValue());
-        }
-        System.out.println(map.size());
-        //System.out.println(m.returnSpecificClassPath(2));
-        String sourcepath = m.returnSpecificClassPath(1);
-        String targetpath = "E://MT//J48.class";
+        int number = Integer.parseInt(args[1]);
+        if (number >= 0) {
+            MutantGetter m = new MutantGetter();
+            m.getMutantsClass("E:\\Mutation\\result\\weka.classifiers.trees.J48");
+            Map<String, String> map = m.get_allpath();
+            for (Map.Entry<String, String> entry : map.entrySet()) {
+                System.out.println("!key= " + entry.getKey() + " and value= " + entry.getValue());
+            }
+            System.out.println(map.size());
+            if(number <map.size()) {
+                //System.out.println(m.returnSpecificClassPath(2));
+                String sourcepath = m.returnSpecificClassPath(number);
+                String targetpath = args[0];
 
-        ReplaceOriginWithMuntant replaceOriginWithMuntant = new ReplaceOriginWithMuntant();
-        replaceOriginWithMuntant.replaceClassFile(sourcepath,targetpath);
+                ReplaceOriginWithMuntant replaceOriginWithMuntant = new ReplaceOriginWithMuntant();
+                replaceOriginWithMuntant.replaceClassFile(sourcepath, targetpath);
+
+                System.out.println(sourcepath);
+            }
+        }
     }
 }
