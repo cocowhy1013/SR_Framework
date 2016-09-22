@@ -19,7 +19,7 @@ public abstract class Automatic_Tester {
     private int score_Test;
     private int[] analyzerResult;
     private int labelRange = 10;
-    final double[] slot = {-1,-0.8,-0.1,0.1,0.8,1.0};
+    final double[] slot = {-1,-0.7,-0.3,0.3,0.7,1.0};
 
     public int[] read_Train_Data(String trainFilePath) throws IOException {
         List<String> lines= FileUtils.readLines(new File(trainFilePath));
