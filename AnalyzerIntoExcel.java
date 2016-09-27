@@ -13,7 +13,7 @@ public class AnalyzerIntoExcel {
         File source = new File(logFile);
         File target = new File(excelFile);
 
-        FileUtils.writeStringToFile(target,"\n",false);
+        FileUtils.writeStringToFile(target,condition+"\n",false);
         int flag = 0;
         List<String> logLines = FileUtils.readLines(source);
         String output = "";
@@ -55,7 +55,7 @@ public class AnalyzerIntoExcel {
     public static void main(String[] args) throws IOException {
         String logFile = "E:\\MT1\\ClassNumber.txt";
         String excelFile = "E:\\MT1\\Excel.csv";
-        String condition = "{-1,-0.4,-0.3,0.3,0.4,1.0}";
+        String condition = "{-1,-0.8,-0.1,0.1,0.8,1.0}";
         AnalyzerIntoExcel analyzerIntoExcel = new AnalyzerIntoExcel();
         analyzerIntoExcel.processLotIntoExcel(logFile,condition,excelFile);
     }

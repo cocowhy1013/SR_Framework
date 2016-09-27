@@ -196,7 +196,7 @@ public class RetriveTreePathForTest extends Automatic_Tester {
         }
     }
 
-    public double caculateScore(String line){
+    public double caculateScoreSplit(String line){
         double dominator = pathNodeList.size();
         double numerator = 0;
         //System.out.println("line:"+line);
@@ -210,6 +210,45 @@ public class RetriveTreePathForTest extends Automatic_Tester {
         if(pathNodeList.get(pathNodeList.size()-1).isLabelSatisfied(line))
             return numerator/dominator*1;
         else return numerator/dominator*(-1);
+    }
+
+
+    public double caculateScore(String line){
+        double dominator = pathNodeList.size();
+        double numerator = 0;
+        HashMap<String, Integer> pathListTogether = new HashMap<String, Integer>();
+
+        //System.out.println("line:"+line);
+        for(int i=0;i<pathNodeList.size();i++){
+            if(pathNodeList.get(i).isAttributeSatisfied(line)) {
+                String attribute = pathNodeList.get(i).getAttributeName();
+                if(pathListTogether.containsKey(attribute))
+                    pathListTogether.put(attribute,pathListTogether.get(attribute)*1);
+                else
+                    pathListTogether.put(attribute,1);
+
+            }
+            else{
+                String attribute = pathNodeList.get(i).getAttributeName();
+                if(pathListTogether.containsKey(attribute))
+                    pathListTogether.put(attribute,pathListTogether.get(attribute)*0);
+                else
+                    pathListTogether.put(attribute,0);
+
+            }
+        }
+        Iterator iterator = pathListTogether.entrySet().iterator();
+
+        while(iterator.hasNext()){
+            Map.Entry<String, Integer> entry = (Map.Entry<String, Integer>)iterator.next();
+            if(entry.getValue()>0)
+                numerator ++;
+
+        }
+
+        if(pathNodeList.get(pathNodeList.size()-1).isLabelSatisfied(line))
+            return numerator/pathListTogether.size()*1;
+        else return numerator/pathListTogether.size()*(-1);
 
     }
     public int int_RandomExcept(int except){
@@ -220,6 +259,7 @@ public class RetriveTreePathForTest extends Automatic_Tester {
 
         return value;
     }
+
     public String replaceAttributeValue(String[] parts, int loc, int value){
         parts[loc] = value+"";
         String line ="";
@@ -229,6 +269,7 @@ public class RetriveTreePathForTest extends Automatic_Tester {
         line = line + parts[parts.length-1];
         return line;
     }
+
     public String generateMaxInstance(String[] parts){
         String result = "";
         for(int i=0;i<parts.length-1;i++){
@@ -391,9 +432,9 @@ public class RetriveTreePathForTest extends Automatic_Tester {
     }*/
     public static void main(String[] args) throws IOException {
 
-        String trainFile = "E:\\MT1\\MutantTest3\\20trainAll.arff";
-        String testFile = "E:\\MT1\\MutantTest3\\20testAll.arff";
-        String treeFile = "E:\\MT1\\MutantTest3\\tree.txt";
+        String trainFile = "E:\\MT1\\LatestTest0\\20trainAll.arff";
+        String testFile = "E:\\MT1\\LatestTest0\\20testAll.arff";
+        String treeFile = "E:\\MT1\\LatestTest0\\tree.txt";
 
         int testNumber = 1;//Integer.parseInt(args[3]);
         int modify_type = 1;//Integer.parseInt(args[4]);
@@ -466,6 +507,7 @@ public class RetriveTreePathForTest extends Automatic_Tester {
                 } else
                     retriver.modifyFile(trainFile, modify_type, modify_strength);
                 //retriver.read_Train_Data("E:\\MT1\\MutantTest3\\20trainAll_after1.arff");
+
 
             }
         }

@@ -1,29 +1,30 @@
-import java.util.Iterator;
+import java.io.IOException;
+import java.lang.reflect.Array;
+import java.util.ArrayList;
 import java.util.List;
-import java.util.ListIterator;
 
 /**
- * Created by coco on 2016/9/6.
+ * Created by Huiyan Wang on 2016/9/27.
  */
-public class TreeNodeExpression {
+public class TreeNodeExpression2 {
     protected String attributeName;
     protected String operator;
     protected String valueSplit;
     protected String label;
 
-    TreeNodeExpression(){
+    TreeNodeExpression2(){
         attributeName = "";
         operator = "";
         valueSplit = "";
         label = "";
     }
-    TreeNodeExpression(String attributeName1, String operator1,String value1,String label1){
+    TreeNodeExpression2(String attributeName1, String operator1,String value1,String label1){
         attributeName = attributeName1;
         operator = operator1;
         valueSplit = value1;
         label = label1;
     }
-    TreeNodeExpression(String line){
+    TreeNodeExpression2(String line){
         attributeName = "";
         operator = "";
         valueSplit = "";
@@ -90,11 +91,26 @@ public class TreeNodeExpression {
         System.out.print(""+label);
     }
 
-    public static void main(String [] args){
 
-    }
+    public static void main(String [] args) throws IOException {
+        String trainFile = "E:\\MT1\\MutantTest3\\20trainAll.arff";
+        String testFile = "E:\\MT1\\MutantTest3\\20testAll.arff";
+        String treeFile = "E:\\MT1\\MutantTest3\\tree.txt";
 
-    public String getAttributeName() {
-        return attributeName;
+        int testNumber = 1;//Integer.parseInt(args[3]);
+        int modify_type = 1;//Integer.parseInt(args[4]);
+        int modify_strength = 1;//Integer.parseInt(args[5]);
+
+        //if(modify_type == -1 && modify_strength == -1) {
+        RetriveTreePathForTest retriver = new RetriveTreePathForTest(trainFile, testFile, treeFile);
+        retriver.generateSingleTestFile(testNumber);
+        retriver.displayList(retriver.getPathList(testNumber));
+
+        //retriver.getPathList(testNumber);
+
+        System.out.println();
+        
+        System.out.println("Score"+retriver.caculateScore("0,9,9,0,0,0,9,0,5,1"));
+        //}
     }
 }

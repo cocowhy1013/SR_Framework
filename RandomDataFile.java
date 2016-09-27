@@ -7,8 +7,8 @@ public class RandomDataFile {
 	public static void randomFile(String filepath,int instance) throws FileNotFoundException{
 		PrintWriter pw = new PrintWriter(new File(filepath));
 		//int instance = 1000;
-		int attribute = 9;//without label
-		int[] attr_scale = {10,10,10,10,10,10,10,10,10,10};
+		int attribute = 19;//without label
+		int[] attr_scale = {10,10,10,10,10,10,10,10,10,10,10,10,10,10,10,10,10,10,10,10};
 		int label_scale = 5;
 		String line = "";
 		for(int k = 0; k < attribute+1;k++){
@@ -31,8 +31,8 @@ public class RandomDataFile {
 		pw.close();
 	} 
 	public static void main(String[] args) throws FileNotFoundException{
-		randomFile("50train.txt",5000);
-		randomFile("50test.txt",500);
+		randomFile("E://50train.txt",1800);
+		randomFile("E://50test.txt",200);
 	}
 	
 }
