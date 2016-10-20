@@ -68,8 +68,8 @@ public class LogResultAnalyzer {
         }
     }
     public static void main(String [] args) throws IOException {
-        String[] rootList = {"E:\\MT1\\Result\\Threshold=0.2"};
-        LogResultAnalyzer analyzer = new LogResultAnalyzer("E:\\MT1\\Result\\final.txt"
+        String[] rootList = {"E:\\MT1\\ResultNew\\0.4"};
+        LogResultAnalyzer analyzer = new LogResultAnalyzer("E:\\MT1\\ResultNew\\0.4\\final.csv"
         ,rootList);
        analyzer.rootProcessor();
        //analyzer.resultFileProcessor("E:\\MT1\\wekaRunner\\FileTest\\result1.txt");

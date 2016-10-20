@@ -176,7 +176,7 @@ public class RetriveTreePathForTest extends Automatic_Tester {
 
     public void displayList(ArrayList<TreeNodeExpression> treeNodeList){
         for(int i=0;i<treeNodeList.size();i++){
-            //System.out.println();
+            System.out.println();
             treeNodeList.get(i).display();
         }
     }
@@ -432,13 +432,13 @@ public class RetriveTreePathForTest extends Automatic_Tester {
     }*/
     public static void main(String[] args) throws IOException {
 
-        String trainFile = "E:\\MT1\\LatestTest0\\20trainAll.arff";
-        String testFile = "E:\\MT1\\LatestTest0\\20testAll.arff";
-        String treeFile = "E:\\MT1\\LatestTest0\\tree.txt";
+        String trainFile = "E:\\MT1\\Latest\\20trainAll.arff";
+        String testFile = "E:\\MT1\\Latest\\20testAll.arff";
+        String treeFile = "E:\\MT1\\Latest\\tree.txt";
 
         int testNumber = 1;//Integer.parseInt(args[3]);
-        int modify_type = 1;//Integer.parseInt(args[4]);
-        int modify_strength = 1;//Integer.parseInt(args[5]);
+        int modify_type = 2;//Integer.parseInt(args[4]);
+        int modify_strength = 100;//Integer.parseInt(args[5]);
 
         if(modify_type == -1 && modify_strength == -1){
             RetriveTreePathForTest retriver = new RetriveTreePathForTest(trainFile,testFile,treeFile);
@@ -482,12 +482,9 @@ public class RetriveTreePathForTest extends Automatic_Tester {
             }
             FileUtils.writeLines(new File(ProcessFile2.replace("Old.java",".java")),lines2,false);
 
-
-
         }
         else {
-
-            for (testNumber = 1; testNumber <= 200; testNumber++) {
+            for (testNumber = 3; testNumber <= 3; testNumber++) {
                 System.out.println("=====testNumber:"+testNumber);
                 RetriveTreePathForTest retriver = new RetriveTreePathForTest(trainFile, testFile, treeFile);
                 //retriver.displayList(retriver.getPathList(testNumber));

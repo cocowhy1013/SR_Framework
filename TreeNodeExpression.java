@@ -1,7 +1,3 @@
-import java.util.Iterator;
-import java.util.List;
-import java.util.ListIterator;
-
 /**
  * Created by coco on 2016/9/6.
  */
@@ -42,6 +38,9 @@ public class TreeNodeExpression {
             valueSplit = parts[2].replace(":","");
             label = "";
         }
+    }
+    public String getAttributeName(){
+        return attributeName;
     }
     public boolean isAttributeSatisfied(String line){
         //System.out.println("line ---- "+line);
@@ -87,14 +86,14 @@ public class TreeNodeExpression {
         System.out.print(""+attributeName);
         System.out.print(""+operator);
         System.out.print(""+valueSplit);
-        System.out.print(""+label);
+        System.out.print("----"+label);
     }
 
     public static void main(String [] args){
 
     }
 
-    public String getAttributeName() {
-        return attributeName;
-    }
+    //public String getAttributeName() {
+    //    return attributeName;
+    //}
 }
