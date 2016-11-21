@@ -60,16 +60,13 @@ public class LogResultAnalyzer {
                     FileUtils.writeStringToFile(target, part[3] + ",", true);
                     FileUtils.writeStringToFile(target, part[5]+",", true);
                     r_type = part[1];
-
                 }
-
-
             }
         }
     }
     public static void main(String [] args) throws IOException {
-        String[] rootList = {"E:\\MT1\\Result\\Threshold=0.2"};
-        LogResultAnalyzer analyzer = new LogResultAnalyzer("E:\\MT1\\Result\\final.txt"
+        String[] rootList = {"E:\\MT1\\Result_ChangeTest\\MUTANTresult\\EntropyBasedSplitCrit\\mutant3"};
+        LogResultAnalyzer analyzer = new LogResultAnalyzer("E:\\MT1\\Result_ChangeTest\\MUTANTresult\\EntropyBasedSplitCrit\\mutant3\\final.csv"
         ,rootList);
        analyzer.rootProcessor();
        //analyzer.resultFileProcessor("E:\\MT1\\wekaRunner\\FileTest\\result1.txt");

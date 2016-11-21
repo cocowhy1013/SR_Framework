@@ -96,10 +96,17 @@ public class RetriveTreePathForTest extends Automatic_Tester {
                 continue;
             else {
                 for(int j=i;j<treelines.size();j++) {
-                    String line = treelines.get(i);
+                    String line = treelines.get(j);
                     if (line.isEmpty())
                         continue;
                     else if (line.startsWith(start)) {
+                        if(line.startsWith(":")){
+                            TreeNodeExpression nodeExpression = getNodeFromLine(line);
+                            pathNodeList.add(nodeExpression);
+                            if(!nodeExpression.label.equals("")){
+                                flag = 0;break;
+                            }
+                        }
 
                         if (line.charAt(start.length()) > '9' ||
                                 line.charAt(start.length()) < '0')
@@ -159,21 +166,22 @@ public class RetriveTreePathForTest extends Automatic_Tester {
                             }
                         }
 
+
                     } else
                         continue;
                     if (treelines.get(j).contains("Number of Leaves"))
                         break;
 
-                    }
                 }
+            }
         }
+
 
         predict_Array = Integer.parseInt(pathNodeList.get(pathNodeList.size()-1).label);
 
         //System.out.println("predict:"+predict_Array);
         return pathNodeList;
     }
-
     public void displayList(ArrayList<TreeNodeExpression> treeNodeList){
         for(int i=0;i<treeNodeList.size();i++){
             //System.out.println();
@@ -184,7 +192,11 @@ public class RetriveTreePathForTest extends Automatic_Tester {
         line = line.replaceAll("\\|   ","");
 
         String[] parts = line.split(" ");
-
+        if(line.startsWith(":")){
+            TreeNodeExpression treeNodeExpression = new TreeNodeExpression("","result",
+                    parts[0].replace(":",""),parts[1]);
+            return treeNodeExpression;
+        }
         if(line.contains(":")){
             TreeNodeExpression treeNodeExpression = new TreeNodeExpression(parts[0],parts[1],
                     parts[2].replace(":",""),parts[3]);
@@ -196,7 +208,7 @@ public class RetriveTreePathForTest extends Automatic_Tester {
         }
     }
 
-    public double caculateScoreSplit(String line){
+    /*public double caculateScore(String line){
         double dominator = pathNodeList.size();
         double numerator = 0;
         //System.out.println("line:"+line);
@@ -210,7 +222,8 @@ public class RetriveTreePathForTest extends Automatic_Tester {
         if(pathNodeList.get(pathNodeList.size()-1).isLabelSatisfied(line))
             return numerator/dominator*1;
         else return numerator/dominator*(-1);
-    }
+
+    }*/
 
 
     public double caculateScore(String line){
@@ -259,7 +272,6 @@ public class RetriveTreePathForTest extends Automatic_Tester {
 
         return value;
     }
-
     public String replaceAttributeValue(String[] parts, int loc, int value){
         parts[loc] = value+"";
         String line ="";
@@ -269,7 +281,6 @@ public class RetriveTreePathForTest extends Automatic_Tester {
         line = line + parts[parts.length-1];
         return line;
     }
-
     public String generateMaxInstance(String[] parts){
         String result = "";
         for(int i=0;i<parts.length-1;i++){
@@ -334,21 +345,21 @@ public class RetriveTreePathForTest extends Automatic_Tester {
 
     }
     public String generateMinInstance(String[] parts){
-            String result = "";
-            for(int i=0;i<parts.length-1;i++){
-                double minScore = 1.0;
-                int minLoc = 0;
-                for(int j=0;j<attriRange;j++){
-                    double score = caculateScore(replaceAttributeValue(parts,i,j));
-                    if(Math.abs(score)<Math.abs(minScore)) {
-                        minScore = score;
-                        minLoc = j;
-                    }
-
+        String result = "";
+        for(int i=0;i<parts.length-1;i++){
+            double minScore = 1.0;
+            int minLoc = 0;
+            for(int j=0;j<attriRange;j++){
+                double score = caculateScore(replaceAttributeValue(parts,i,j));
+                if(Math.abs(score)<Math.abs(minScore)) {
+                    minScore = score;
+                    minLoc = j;
                 }
-                parts[i] = minLoc+"";
-                result = result + minLoc + "," ;
+
             }
+            parts[i] = minLoc+"";
+            result = result + minLoc + "," ;
+        }
         result = result + parts[parts.length-1];
         return result;
     }
@@ -432,13 +443,13 @@ public class RetriveTreePathForTest extends Automatic_Tester {
     }*/
     public static void main(String[] args) throws IOException {
 
-        String trainFile = "E:\\MT1\\LatestTest0\\20trainAll.arff";
-        String testFile = "E:\\MT1\\LatestTest0\\20testAll.arff";
-        String treeFile = "E:\\MT1\\LatestTest0\\tree.txt";
+        String trainFile = args[0];
+        String testFile = args[1];//"E:\\MT1\\MutantTest3\\20testAll.arff";
+        String treeFile = args[2];//"E:\\MT1\\MutantTest3\\tree.txt";
 
-        int testNumber = 1;//Integer.parseInt(args[3]);
-        int modify_type = 1;//Integer.parseInt(args[4]);
-        int modify_strength = 1;//Integer.parseInt(args[5]);
+        int testNumber = Integer.parseInt(args[3]);
+        int modify_type = Integer.parseInt(args[4]);
+        int modify_strength = Integer.parseInt(args[5]);
 
         if(modify_type == -1 && modify_strength == -1){
             RetriveTreePathForTest retriver = new RetriveTreePathForTest(trainFile,testFile,treeFile);
@@ -451,25 +462,70 @@ public class RetriveTreePathForTest extends Automatic_Tester {
             int[] PartitionNum = retriver.read_Train_Data(trainFile);
             File file = new File(args[6]);
             FileUtils.writeStringToFile(file,"",false);
-            for(int percent=5;percent<=100;percent=percent+5) {
-                for(int i=0;i<6;i++) {
-                    int j;
-                    if(i==0||i==1)
-                        j = percent*PartitionNum[0]/100;
-                    else if(i==2||i==3)
-                        j = percent*PartitionNum[2]/100;
-                    else
-                        j = percent*PartitionNum[1]/100;
-                    for(int k=0;k<50;k++) {
-                        FileUtils.writeStringToFile(file, "java -Djava.ext.dirs=E:\\MT\\wekaRunner" +
-                                "\\lib -Xms100m -Xmx512m RetriveTreePathForTest 20train.arff 20testAll.arff tree.txt " + testNumber+" "+ i + " " + j + "\n", true);
-                        FileUtils.writeStringToFile(file, "java -Djava.ext.dirs=E:\\MT\\wekaRunner\\lib " +
-                                "-Xms100m -Xmx512m weka.classifiers.trees.J48 -C 0.25 -M 3 -t 20train_after.arff -d model.model > tree1.txt\n", true);
-                        FileUtils.writeStringToFile(file, "java -Djava.ext.dirs=E:\\MT\\wekaRunner\\lib " +
-                                "-Xms100m -Xmx512m weka.classifiers.trees.J48 -p 10 -l model.model -T 20testSingle.arff > "+i+"\\predict_"+i+"_"+j+"_"+k+".txt\n\n", true);
 
+            for(int percent=10;percent<=100;percent=percent+10) {
+                for(int i=0;i<4;i++) {
+                    int j;
+                    int classflag = 0;
+                    if(i==0||i==1){
+                        if(PartitionNum[2]<100 && PartitionNum[2]>20)
+                            classflag = -1;
+                        else if(PartitionNum[2]<=20)
+                            classflag = -2;
                     }
-                    //System.out.println(j);
+                    else if(i==2||i==3){
+                        if(PartitionNum[0]<100 && PartitionNum[0]>20)
+                            classflag = -1;
+                        else if(PartitionNum[0]<=20)
+                            classflag = -2;
+                    }
+                    else{
+                        if(PartitionNum[1]<100 && PartitionNum[1]>20)
+                            classflag = -1;
+                        else if(PartitionNum[1]<=20)
+                            classflag = -2;
+                    }
+
+                    if(classflag == 0){
+                        if(i==0||i==1)
+                            j = percent*PartitionNum[2]/100;
+                        else if(i==2||i==3)
+                            j = percent*PartitionNum[0]/100;
+                        else
+                            j = percent*PartitionNum[1]/100;
+                        for(int k=0;k<25;k++) {
+
+                            FileUtils.writeStringToFile(file, "java -Djava.ext.dirs=E:\\MT\\wekaRunner" +
+                                    "\\lib RetriveTreePathForTest 20train.arff 20testAll.arff tree.txt " + testNumber+" "+ i + " " + j + "\n", true);
+                            FileUtils.writeStringToFile(file, "java -Djava.ext.dirs=E:\\MT\\wekaRunner\\lib " +
+                                    "weka.classifiers.trees.J48 -C 0.25 -M 3 -t 20train_after.arff -d model.model > tree1.txt\n", true);
+                            FileUtils.writeStringToFile(file, "java -Djava.ext.dirs=E:\\MT\\wekaRunner\\lib " +
+                                    "weka.classifiers.trees.J48 -p 10 -l model.model -T 20testSingle.arff > "+i+"\\predict_"+i+"_"+j+"_"+k+".txt\n\n", true);
+
+                        }
+                        //System.out.println(j);
+                    }
+                    else if(classflag == -1){
+
+                        if(i==0||i==1)
+                            j = percent*PartitionNum[2]/100;
+                        else if(i==2||i==3)
+                            j = percent*PartitionNum[0]/100;
+                        else
+                            j = percent*PartitionNum[1]/100;
+                        for(int k=0;k<25;k++) {
+
+                            FileUtils.writeStringToFile(file, "java -Djava.ext.dirs=E:\\MT\\wekaRunner" +
+                                    "\\lib RetriveTreePathForTest 20train.arff 20testAll.arff tree.txt " + testNumber+" "+ i + " " + j + "\n", true);
+                            FileUtils.writeStringToFile(file, "java -Djava.ext.dirs=E:\\MT\\wekaRunner\\lib " +
+                                    "weka.classifiers.trees.J48 -C 0.25 -M 3 -t 20train_after.arff -d model.model > tree1.txt\n", true);
+                            FileUtils.writeStringToFile(file, "java -Djava.ext.dirs=E:\\MT\\wekaRunner\\lib " +
+                                    "weka.classifiers.trees.J48 -p 10 -l model.model -T 20testSingle.arff > "+i+"\\predict_"+i+"_"+j+"_"+k+".txt\n\n", true);
+                        }
+                        //System.out.println(j);
+                    }
+
+
                 }
             }
 
@@ -486,30 +542,27 @@ public class RetriveTreePathForTest extends Automatic_Tester {
 
         }
         else {
+            RetriveTreePathForTest retriver = new RetriveTreePathForTest(trainFile,testFile,treeFile);
+            //retriver.displayList(retriver.getPathList(testNumber));
+            retriver.getPathList(testNumber);
+            //System.out.println();
+            //System.out.println("Score"+retriver.caculateScore("0,9,9,0,0,0,9,0,0,1"));
 
-            for (testNumber = 1; testNumber <= 200; testNumber++) {
-                System.out.println("=====testNumber:"+testNumber);
-                RetriveTreePathForTest retriver = new RetriveTreePathForTest(trainFile, testFile, treeFile);
-                //retriver.displayList(retriver.getPathList(testNumber));
-                retriver.getPathList(testNumber);
-                //System.out.println();
-                //System.out.println("Score"+retriver.caculateScore("0,9,9,0,0,0,9,0,0,1"));
+            retriver.read_Train_Data(trainFile);
 
-                retriver.read_Train_Data(trainFile);
-
-                //double max = retriver.getMaxScore();
-                //double min = retriver.getMinScore();
-                if (modify_type == 1 || modify_type == 3) {
-                    if (retriver.isGeneratable()) {
-                        retriver.modifyFile(trainFile, modify_type, modify_strength);
-                    } else
-                        System.out.println("Cannot be generated!");
-                } else
-                    retriver.modifyFile(trainFile, modify_type, modify_strength);
-                //retriver.read_Train_Data("E:\\MT1\\MutantTest3\\20trainAll_after1.arff");
-
-
+            //double max = retriver.getMaxScore();
+            //double min = retriver.getMinScore();
+            if(modify_type==1||modify_type==3) {
+                if(retriver.isGeneratable()){
+                    retriver.modifyFile(trainFile,modify_type,modify_strength);
+                }
+                else
+                    System.out.println("Cannot be generated!");
             }
+            else
+                retriver.modifyFile(trainFile,modify_type,modify_strength);
+            //retriver.read_Train_Data("E:\\MT1\\MutantTest3\\20trainAll_after1.arff");
+
         }
         //System.out.println(retriver.getTest(4));
 

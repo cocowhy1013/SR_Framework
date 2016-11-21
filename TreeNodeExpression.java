@@ -46,6 +46,8 @@ public class TreeNodeExpression {
     public boolean isAttributeSatisfied(String line){
         //System.out.println("line ---- "+line);
         String[] parts = line.split(",");
+        if(attributeName.isEmpty())
+            return true;
         String valuetest = parts[Integer.parseInt(attributeName)];
         if(operator.equals("<")){
             if(Integer.parseInt(valuetest)<Integer.parseInt(valueSplit))
@@ -75,6 +77,9 @@ public class TreeNodeExpression {
         else
             return false;
     }
+    public String getAttributeName() {
+        return attributeName;
+    }
     public boolean isLabelSatisfied(String line){
         String[] parts = line.split(",");
         String labeltest = parts[parts.length-1];
@@ -90,11 +95,4 @@ public class TreeNodeExpression {
         System.out.print(""+label);
     }
 
-    public static void main(String [] args){
-
-    }
-
-    public String getAttributeName() {
-        return attributeName;
-    }
 }

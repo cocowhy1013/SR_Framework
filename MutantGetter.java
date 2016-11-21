@@ -154,21 +154,26 @@ public class MutantGetter {
 
     public static void main(String[] args) throws IOException {
 
-        String mutantRoot = args[0];//"E:\\Mutation\\result\\weka.classifiers.trees.J48";
-        int mutantNumber = Integer.parseInt(args[1]);//"1");
-        String originFile = args[2];//"E:\\MT\\J48.class";
+        String mutantRoot = "E:\\Mutation\\result\\weka.classifiers.trees.j48.InfoGainSplitCrit";
+        //int mutantNumber = Integer.parseInt(args[1]);//"1");
+        //String originFile = args[2];//"E:\\MT\\J48.class";
         MutantGetter m = new MutantGetter();
         m.getMutantsClass(mutantRoot);
         Map<String, String> map = m.get_allpath();
-        /*for (Map.Entry<String, String> entry : map.entrySet()) {
-            System.out.println("!key= " + entry.getKey() + " and value= "+ entry.getValue());
-        }*/
-        //System.out.println(map.size());
-        //System.out.println(map.size());
+        int number = 0;
+        for (Map.Entry<String, String> entry : map.entrySet()) {
+            if (entry.getValue().contains("traditional")) {
+                number++;
+                System.out.print(number-1);
+                System.out.println("!key= " + entry.getKey() + " and value= " + entry.getValue());
+            }
+        }
+        System.out.println(map.size());
+        System.out.println(number);
         //System.out.println(m.returnSpecificClassPath(2));
 
-        if(mutantNumber<map.size())
-            m.replaceClassFile(m.returnSpecificClassPath(mutantNumber),originFile);
+ //       if(mutantNumber<map.size())
+//            m.replaceClassFile(m.returnSpecificClassPath(mutantNumber),originFile);
 
     }
 
