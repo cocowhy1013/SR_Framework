@@ -221,6 +221,32 @@ public class RetriveTreePathForTest extends Automatic_Tester {
     }
 
     public double caculateScore(String line){
+        return caculateScoreConditionCoverNoMerge(line);
+        //return caculateScorePathCover(line);
+        //return caculateScoreConditionCoverMerge(line);
+    }
+
+    public double caculateScoreConditionCoverNoMerge(String line){
+        double dominator = pathNodeList.size();
+
+        double numerator = 0;
+        //displayList(pathNodeList);
+        //System.out.println("size"+pathNodeList.size());W
+        for(int i=0;i<pathNodeList.size();i++){
+            if(pathNodeList.get(i).isAttributeSatisfied(line)) {
+                numerator++;//System.out.println("1");
+            }
+            else
+                ;//System.out.println("-1");
+        }
+        //System.out.println("size"+pathNodeList.size());
+        //System.out.println("dominator"+numerator);
+        if(pathNodeList.get(pathNodeList.size()-1).isLabelSatisfied(line))
+            return numerator/dominator*1;
+        else return numerator/dominator*(-1);
+
+    }
+    public double caculateScorePathCover(String line){//PathCover
         double dominator = pathNodeList.size();
 
         double numerator = 0;
@@ -241,8 +267,7 @@ public class RetriveTreePathForTest extends Automatic_Tester {
 
     }
 
-/*
-    public double caculateScore(String line){
+    public double caculateScoreConditionCoverMerge(String line){
         double dominator = pathNodeList.size();
         double numerator = 0;
         HashMap<String, Integer> pathListTogether = new HashMap<String, Integer>();
@@ -279,8 +304,7 @@ public class RetriveTreePathForTest extends Automatic_Tester {
         if(pathNodeList.get(pathNodeList.size()-1).isLabelSatisfied(line))
             return numerator/pathListTogether.size()*1;
         else return numerator/pathListTogether.size()*(-1);
-
-    }*/
+    }
     public int int_RandomExcept(int except){
         int value = (int)(Math.random()*labelRange);
         while(value == except){
@@ -407,12 +431,72 @@ public class RetriveTreePathForTest extends Automatic_Tester {
         result = result + parts[parts.length-1];
         return result;
     }
-    //@Override
     protected String modifyLine(String trainLine, int modify_type) throws IOException {
-        String[] parts = trainLine.split(",");
+        return modifyLineNewHighQuality(trainLine, modify_type);
+        //return modifyLineHighQuality(trainLine, modify_type);
+        //return modifyLineGenerate(trainLine, modify_type);
+    }
+
+
+    protected String modifyLineNewHighQuality(String trainLine, int modify_type) throws IOException {
+        String resultLine = "";
+        if(modify_type==0){//0: positive->negative
+
+            resultLine = generateFullScoreInstance(pathNodeList,modify_type);
+        }
+
+        else if(modify_type==1){//1: positive->irrelevant
+            String[] parts = trainLine.split(",");
+
+            resultLine = generateMinInstance(parts);
+
+        }
+
+        else if(modify_type==2){//2: negative->positive
+            resultLine = generateFullScoreInstance(pathNodeList,modify_type);
+        }
+
+        else if(modify_type==3){//3: negative->irrelevant
+            String[] parts = trainLine.split(",");
+            resultLine = generateMinInstance(parts);
+        }
+
+        else if(modify_type==4){//4: irrelevant->positive
+            String[] parts = trainLine.split(",");
+            resultLine = generateMaxInstance(parts);
+            resultLine = modifyLine(resultLine,2);
+        }
+
+        else if(modify_type==5){//5: irrelevant->negative
+            String[] parts = trainLine.split(",");
+            resultLine = generateMaxInstance(parts);
+            resultLine = modifyLine(resultLine,0);
+        }
+        else if(modify_type==-1) {//-1: generate positive 100%
+            String testLine = testLineBase;
+            String[] test_parts = testLine.split(",");
+            for(int i=0;i<test_parts.length-1;i++){
+                resultLine = resultLine+test_parts[i]+",";
+            }
+            resultLine = resultLine+ predict_Array;
+        }
+        else if(modify_type==-2){//-1: generate negative 100%
+            String testLine = testLineBase;
+            String[] test_parts = testLine.split(",");
+            for(int i=0;i<test_parts.length-1;i++){
+                resultLine = resultLine+test_parts[i]+",";
+            }
+            resultLine = resultLine+ int_RandomExcept(predict_Array);
+        }
+        //System.out.println(trainLine+"--->"+resultLine);
+        return resultLine;
+    }
+    //@Override
+    protected String modifyLineHighQuality(String trainLine, int modify_type) throws IOException {
         String resultLine = "";
         if(modify_type==0){//0: positive->negative
             String testLine = testLineBase;
+            //System.out.println("testLine:"+testLineBase);
             String[] test_parts = testLine.split(",");
             for(int i=0;i<test_parts.length-1;i++){
                 resultLine = resultLine+test_parts[i]+",";
@@ -421,6 +505,7 @@ public class RetriveTreePathForTest extends Automatic_Tester {
         }
 
         else if(modify_type==1){//1: positive->irrelevant
+            String[] parts = trainLine.split(",");
 
             resultLine = generateMinInstance(parts);
 
@@ -436,23 +521,25 @@ public class RetriveTreePathForTest extends Automatic_Tester {
         }
 
         else if(modify_type==3){//3: negative->irrelevant
+            String[] parts = trainLine.split(",");
             resultLine = generateMinInstance(parts);
         }
 
         else if(modify_type==4){//4: irrelevant->positive
-
+            String[] parts = trainLine.split(",");
             resultLine = generateMaxInstance(parts);
             resultLine = modifyLine(resultLine,2);
         }
 
         else if(modify_type==5){//5: irrelevant->negative
+            String[] parts = trainLine.split(",");
             resultLine = generateMaxInstance(parts);
             resultLine = modifyLine(resultLine,0);
         }
         else if(modify_type==-1) {//-1: generate positive 100%
             String testLine = testLineBase;
             String[] test_parts = testLine.split(",");
-            for(int i=0;i<parts.length-1;i++){
+            for(int i=0;i<test_parts.length-1;i++){
                 resultLine = resultLine+test_parts[i]+",";
             }
             resultLine = resultLine+ predict_Array;
@@ -460,14 +547,15 @@ public class RetriveTreePathForTest extends Automatic_Tester {
         else if(modify_type==-2){//-1: generate negative 100%
             String testLine = testLineBase;
             String[] test_parts = testLine.split(",");
-            for(int i=0;i<parts.length-1;i++){
+            for(int i=0;i<test_parts.length-1;i++){
                 resultLine = resultLine+test_parts[i]+",";
             }
             resultLine = resultLine+ int_RandomExcept(predict_Array);
         }
-        System.out.println(trainLine+"--->"+resultLine);
+        //System.out.println(trainLine+"--->"+resultLine);
         return resultLine;
     }
+
 
     //@Override
     protected String modifyLineGenerate(String trainLine, int modify_type) throws IOException {
