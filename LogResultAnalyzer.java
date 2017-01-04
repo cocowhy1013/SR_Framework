@@ -65,8 +65,8 @@ public class LogResultAnalyzer {
         }
     }
     public static void main(String [] args) throws IOException {
-        String[] rootList = {"E:\\MT1\\Result_ChangeTest\\MUTANTresult\\EntropyBasedSplitCrit\\mutant3"};
-        LogResultAnalyzer analyzer = new LogResultAnalyzer("E:\\MT1\\Result_ChangeTest\\MUTANTresult\\EntropyBasedSplitCrit\\mutant3\\final.csv"
+        String[] rootList = {"E:\\MT1\\Result_NewDataset50\\MutantResult\\ConditionCoverNoMerge_NewHigh\\mutant1"};
+        LogResultAnalyzer analyzer = new LogResultAnalyzer("E:\\MT1\\Result_NewDataset50\\MutantResult\\ConditionCoverNoMerge_NewHigh\\mutant1\\finalAll.csv"
         ,rootList);
        analyzer.rootProcessor();
        //analyzer.resultFileProcessor("E:\\MT1\\wekaRunner\\FileTest\\result1.txt");

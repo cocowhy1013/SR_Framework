@@ -61,6 +61,7 @@ public abstract class Automatic_Tester {
         for(int i=0;i<score_List.size();i++){
             // System.out.println("--"+score_Test);
             double temp = score_List.get(i);
+            //System.out.println(temp);
             if(temp>=slot[0]&&temp<=slot[1])
                 analyzerResult[0]++;
             else if(temp>=slot[2]&&temp<=slot[3])
@@ -93,8 +94,224 @@ public abstract class Automatic_Tester {
         //    System.out.print(array[i]+"| ");
         return array;
     }
-
     public void modifyFile(String trainFilePath, int modify_type,int modify_strength) throws IOException {
+       /* 0: positive->negative
+        1: positive->irrelevant
+        2: negative->positive
+        3: negative->irrelevant
+        4: irrelevant->positive
+        5: irrelevant->negative
+        modify_strength: 0.1---1.0
+
+        System.out.println("Negative: "+analyzerResult[0]);
+        System.out.println("Irrelevant: "+analyzerResult[1]);
+        System.out.println("Positive: "+analyzerResult[2]);
+        System.out.println("Undecidable: "+analyzerResult[3]);
+        */
+
+        List<String> lines= FileUtils.readLines(new File(trainFilePath));
+
+        if(modify_type==0||modify_type==1){
+            int positive_Sum = analyzerResult[2];
+            int target_num = 0;
+            if(modify_type == 0)
+                target_num = analyzerResult[0];
+            else if(modify_type == 1)
+                target_num = analyzerResult[1];
+
+            int modify_num = 0;
+            int[] modify_instance_Array;
+            if(modify_strength<positive_Sum) {
+                modify_instance_Array = array_Random(modify_strength, positive_Sum);
+                modify_num = modify_strength;
+            }
+            else {
+                modify_instance_Array = array_Random(positive_Sum, positive_Sum);
+                modify_num = positive_Sum;
+            }
+            //Arrays.sort(modify_instance_Array);
+            if(positive_Sum >= target_num) {
+                int[] target_Array = array_Random(modify_num*target_num/positive_Sum,modify_num);
+                int number = -1;
+                int modify_k = -1;
+
+                for (int i = 0; i < lines.size(); i++) {
+                    if (lines.get(i).contains("@") || lines.get(i).isEmpty())
+                        continue;
+                    double score = caculateScore(lines.get(i));
+                    if (score < slot[4])//+0.8~1.0
+                        continue;
+                    else number++;
+                    if (isExist(modify_instance_Array, number)) {
+                        modify_k++;
+                        if(isExist(target_Array,modify_k))
+                            lines.set(i, modifyLine(lines.get(i), modify_type));
+                        else
+                            lines.set(i,"---");
+                    }
+                }
+            }
+            else{
+                int number = -1;
+                for (int i = 0; i < lines.size(); i++) {
+                    if (lines.get(i).contains("@") || lines.get(i).isEmpty())
+                        continue;
+                    double score = caculateScore(lines.get(i));
+                    if (score < slot[4])//+0.8~1.0
+                        continue;
+                    else number++;
+                    if (isExist(modify_instance_Array, number)) {
+                        lines.set(i, modifyLine(lines.get(i), modify_type));
+                    }
+                }
+                for(int j =0;j<modify_num*target_num/positive_Sum-modify_num;j++){
+                    if(modify_type==0)
+                        lines.add(modifyLine(" ", modify_type));
+                    else
+                        lines.add(selectCertainTypeLine(trainFilePath,modify_type));
+                }
+            }
+
+        }
+        else if(modify_type==2||modify_type==3){
+            int Negative_Sum = analyzerResult[0];
+            int target_num = 0;
+            if(modify_type == 2)
+                target_num = analyzerResult[2];
+            else if(modify_type == 3)
+                target_num = analyzerResult[1];
+
+            int modify_num = 0;
+            int[] modify_instance_Array;
+            if(modify_strength<Negative_Sum) {
+                modify_instance_Array = array_Random(modify_strength, Negative_Sum);
+                modify_num = modify_strength;
+            }
+            else {
+                modify_instance_Array = array_Random(Negative_Sum, Negative_Sum);
+                modify_num = Negative_Sum;
+            }
+            //Arrays.sort(modify_instance_Array);
+            if(Negative_Sum >= target_num) {
+                int[] target_Array = array_Random(modify_num*target_num/Negative_Sum,modify_num);
+                int number = -1;
+                int modify_k = -1;
+
+                for (int i = 0; i < lines.size(); i++) {
+                    if (lines.get(i).contains("@") || lines.get(i).isEmpty())
+                        continue;
+                    double score = caculateScore(lines.get(i));
+                    if(score>slot[1])//-1.0~-0.8
+                        continue;
+                    else number++;
+                    if (isExist(modify_instance_Array, number)) {
+                        modify_k++;
+                        if(isExist(target_Array,modify_k))
+                            lines.set(i, modifyLine(lines.get(i), modify_type));
+                        else
+                            lines.set(i,"---");
+                    }
+                }
+            }
+            else{
+                int number = -1;
+                for (int i = 0; i < lines.size(); i++) {
+                    if (lines.get(i).contains("@") || lines.get(i).isEmpty())
+                        continue;
+                    double score = caculateScore(lines.get(i));
+                    if(score>slot[1])//-1.0~-0.8
+                        continue;
+                    else number++;
+                    if (isExist(modify_instance_Array, number)) {
+                        lines.set(i, modifyLine(lines.get(i), modify_type));
+                    }
+                }
+                for(int j =0;j<modify_num*target_num/Negative_Sum-modify_num;j++){
+                    if(modify_type==0)
+                        lines.add(modifyLine(" ", modify_type));
+                    else
+                        lines.add(selectCertainTypeLine(trainFilePath,modify_type));
+                }
+            }
+
+        }
+        else if(modify_type==4||modify_type==5){
+            int IR_Sum = analyzerResult[1];
+            int target_num = 0;
+            if(modify_type == 4)
+                target_num = analyzerResult[2];
+            else if(modify_type == 5)
+                target_num = analyzerResult[1];
+
+            int modify_num = 0;
+            int[] modify_instance_Array;
+            if(modify_strength<IR_Sum) {
+                modify_instance_Array = array_Random(modify_strength, IR_Sum);
+                modify_num = modify_strength;
+            }
+            else {
+                modify_instance_Array = array_Random(IR_Sum, IR_Sum);
+                modify_num = IR_Sum;
+            }
+            //Arrays.sort(modify_instance_Array);
+            if(IR_Sum >= target_num) {
+                int[] target_Array = array_Random(modify_num*target_num/IR_Sum,modify_num);
+                int number = -1;
+                int modify_k = -1;
+                for (int i = 0; i < lines.size(); i++) {
+                    if (lines.get(i).contains("@") || lines.get(i).isEmpty())
+                        continue;
+                    double score = caculateScore(lines.get(i));
+                    if(score<=slot[2]||score>=slot[3])//-0.1~+0.1
+                        continue;
+                    else number++;
+                    if (isExist(modify_instance_Array, number)) {
+                        modify_k++;
+                        if(isExist(target_Array,modify_k))
+                            lines.set(i, modifyLine(lines.get(i), modify_type));
+                        else
+                            lines.set(i,"---");
+                    }
+                }
+            }
+            else{
+                int number = -1;
+                for (int i = 0; i < lines.size(); i++) {
+                    if (lines.get(i).contains("@") || lines.get(i).isEmpty())
+                        continue;
+                    double score = caculateScore(lines.get(i));
+                    if(score<=slot[2]||score>=slot[3])//-0.1~+0.1
+                        continue;
+                    else number++;
+                    if (isExist(modify_instance_Array, number)) {
+                        lines.set(i, modifyLine(lines.get(i), modify_type));
+                    }
+                }
+                for(int j =0;j<modify_num*target_num/IR_Sum-modify_num;j++){
+                    lines.add(selectCertainTypeLine(trainFilePath,modify_type));
+                }
+            }
+
+        }
+        for(int k=0;k<lines.size();k++){
+            //System.out.println("line:"+lines.size());
+            //if(lines.get(k)=="")
+            //System.out.println("k:"+k+" "+lines.size());
+                //System.out.println("line:"+lines.get(k));
+            if(lines.get(k).equals("---")) {
+                lines.remove(k);
+                k--;
+            }
+        }
+
+        FileUtils.writeLines(new File(trainFilePath.replace(".arff","_after.arff")),lines,false);
+    }
+    public void modifyFileGenerate(String trainFilePath, int modify_type,int modify_strength) throws IOException {
+        /*modify_timestamp: 20161215;modifyFileGenerate: each time we modify according to their proporation and control type, but donot control
+        to generate 100% positive(similarity:+1) or 100% negative(similarity:-1).
+        when need to generate more target type than source, we select its type from history
+        */
+
        /* 0: positive->negative
         1: positive->irrelevant
         2: negative->positive
@@ -300,7 +517,7 @@ public abstract class Automatic_Tester {
         int[] modify_instance_Array;
         int certain = 1;
         List<String> lines= FileUtils.readLines(new File(trainFilePath));
-        if(modify_type==0||modify_type==1) {
+        if(modify_type==2||modify_type==4) {
             int positive_Sum = analyzerResult[2];
             modify_instance_Array = array_Random(certain, positive_Sum);
             int number = -1;
@@ -316,7 +533,7 @@ public abstract class Automatic_Tester {
                 }
             }
         }
-        else if(modify_type==2||modify_type==3) {
+        else if(modify_type==0||modify_type==5) {
             int negative_Sum = analyzerResult[0];
             modify_instance_Array = array_Random(certain, negative_Sum);
             int number = -1;
@@ -332,22 +549,31 @@ public abstract class Automatic_Tester {
                 }
             }
         }
-        else if(modify_type==4||modify_type==5){
-            int negative_Sum = analyzerResult[1];
-            modify_instance_Array = array_Random(certain, negative_Sum);
+        else if(modify_type==1||modify_type==3){
+            int ir_Sum = analyzerResult[1];
+            //System.out.println("ir_Sum:"+ir_Sum);
+            //System.out.println("certain:"+certain);
+            //System.out.println("line size:"+lines.size());
+            modify_instance_Array = array_Random(certain, ir_Sum);
+            //for(int i=0;i<modify_instance_Array.length;i++)
+            //    System.out.print(modify_instance_Array[i]+",");
+           // System.out.println();
             int number = -1;
             for (int i = 0; i < lines.size(); i++) {
                 if (lines.get(i).contains("@") || lines.get(i).isEmpty())
                     continue;
                 double score = caculateScore(lines.get(i));
-                if(score<=slot[2]||score>=slot[3])//-0.1~+0.1
+                if(score<slot[2]||score>slot[3])//-0.1~+0.1
                     continue;
                 else number++;
+                //System.out.println("number:"+number);
                 if (isExist(modify_instance_Array, number)) {
+                    //System.out.println("numberend:"+number);
                     return lines.get(i);
                 }
             }
         }
+        //System.out.println("out null");
         return null;
     }
     public void modifyFileOld(String trainFilePath, int modify_type,int modify_strength) throws IOException {
@@ -428,11 +654,13 @@ public abstract class Automatic_Tester {
     }
     protected abstract double caculateScore(String line);
 
-    protected abstract String modifyLine(String s, int modify_type);
+
+    protected abstract String modifyLine(String s, int modify_type) throws IOException;
 
     protected abstract double generateMaxInstanceScore(String line);
 
     protected abstract double generateMinInstanceScore(String line);
+
 
     public boolean isExist(int[] array, int value){
         for(int i=0;i<array.length;i++){

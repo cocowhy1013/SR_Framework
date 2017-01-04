@@ -1,7 +1,9 @@
 import org.apache.commons.io.FileUtils;
+import org.apache.commons.io.filefilter.MagicNumberFileFilter;
 
 import java.io.File;
 import java.io.IOException;
+import java.lang.reflect.Array;
 import java.util.*;
 
 /**
@@ -12,9 +14,10 @@ public class RetriveTreePathForTest extends Automatic_Tester {
     private String testfile;
     private String modelfile;
     private ArrayList<TreeNodeExpression> pathNodeList;
-    private int labelRange = 10;
+    private int labelRange = 5;
     private int attriRange = 10;
     private int predict_Array;
+    private String testLineBase;
 
     RetriveTreePathForTest(String trainfile1, String testfile1, String modelfile1){
         trainfile = trainfile1;
@@ -37,13 +40,17 @@ public class RetriveTreePathForTest extends Automatic_Tester {
             if(lineslist.get(i).contains("@data")) {
                 flag = 1;
                 int data_size = lineslist.size() - i - 1;
-                if (number > data_size)
+                if (number > data_size) {
                     System.out.println("out of size");
+                    testLineBase = lineslist.get(i + 1);
+                    return testLineBase;
+                }
                 else {
                     FileUtils.writeStringToFile(targetFile, lineslist.get(i + number)+"\n",true);
 
 
-                    return lineslist.get(i+number);
+                    testLineBase = lineslist.get(i+number);
+                    return testLineBase;
                 }
             }
         }
@@ -81,7 +88,7 @@ public class RetriveTreePathForTest extends Automatic_Tester {
         //ArrayList<TreeNodeExpression> pathNodeList = new ArrayList<TreeNodeExpression>();
 
         String[] testline = getTest(number).split(",");
-        int [] parts_Test = new int[testline.length];
+        double [] parts_Test = new double[testline.length];
         for(int i = 0;i<parts_Test.length;i++) {
             parts_Test[i] = Integer.parseInt(testline[i]);
         }
@@ -115,7 +122,7 @@ public class RetriveTreePathForTest extends Automatic_Tester {
 
                         if(nodeExpression.operator.equals("<")){
                             if(parts_Test[Integer.parseInt(nodeExpression.attributeName)]<
-                                    Integer.parseInt(nodeExpression.valueSplit)) {
+                                    Double.parseDouble(nodeExpression.valueSplit)) {
                                 pathNodeList.add(nodeExpression);
                                 start = start + "|   ";
                                 if(!nodeExpression.label.equals("")){
@@ -125,7 +132,7 @@ public class RetriveTreePathForTest extends Automatic_Tester {
                         }
                         else if(nodeExpression.operator.equals("<=")){
                             if(parts_Test[Integer.parseInt(nodeExpression.attributeName)]<=
-                                    Integer.parseInt(nodeExpression.valueSplit)) {
+                                    Double.parseDouble(nodeExpression.valueSplit)) {
                                 pathNodeList.add(nodeExpression);
                                 start = start + "|   ";
                                 if(!nodeExpression.label.equals("")){
@@ -135,7 +142,8 @@ public class RetriveTreePathForTest extends Automatic_Tester {
                         }
                         else if(nodeExpression.operator.equals("=")){
                             if(parts_Test[Integer.parseInt(nodeExpression.attributeName)]==
-                                    Integer.parseInt(nodeExpression.valueSplit)) {
+                                    Double.parseDouble(nodeExpression.valueSplit)
+                                    ||Math.abs(parts_Test[Integer.parseInt(nodeExpression.attributeName)]-Double.parseDouble(nodeExpression.valueSplit))<1e-5) {
                                 pathNodeList.add(nodeExpression);
                                 start = start + "|   ";
                                 if(!nodeExpression.label.equals("")){
@@ -146,7 +154,7 @@ public class RetriveTreePathForTest extends Automatic_Tester {
                         }
                         else if(nodeExpression.operator.equals(">")){
                             if(parts_Test[Integer.parseInt(nodeExpression.attributeName)]>
-                                    Integer.parseInt(nodeExpression.valueSplit)) {
+                                    Double.parseDouble(nodeExpression.valueSplit)) {
                                 pathNodeList.add(nodeExpression);
                                 start = start + "|   ";
                                 if(!nodeExpression.label.equals("")){
@@ -157,7 +165,7 @@ public class RetriveTreePathForTest extends Automatic_Tester {
                         }
                         else if(nodeExpression.operator.equals(">=")){
                             if(parts_Test[Integer.parseInt(nodeExpression.attributeName)]>=
-                                    Integer.parseInt(nodeExpression.valueSplit)) {
+                                    Double.parseDouble(nodeExpression.valueSplit)) {
                                 pathNodeList.add(nodeExpression);
                                 start = start + "|   ";
                                 if(!nodeExpression.label.equals("")){
@@ -182,9 +190,13 @@ public class RetriveTreePathForTest extends Automatic_Tester {
         //System.out.println("predict:"+predict_Array);
         return pathNodeList;
     }
+
+    public ArrayList<TreeNodeExpression> getPathNodeList(){
+        return pathNodeList;
+    }
     public void displayList(ArrayList<TreeNodeExpression> treeNodeList){
         for(int i=0;i<treeNodeList.size();i++){
-            //System.out.println();
+            System.out.println();
             treeNodeList.get(i).display();
         }
     }
@@ -208,24 +220,28 @@ public class RetriveTreePathForTest extends Automatic_Tester {
         }
     }
 
-    /*public double caculateScore(String line){
+    public double caculateScore(String line){
         double dominator = pathNodeList.size();
+
         double numerator = 0;
-        //System.out.println("line:"+line);
+        //displayList(pathNodeList);
+        //System.out.println("size"+pathNodeList.size());W
         for(int i=0;i<pathNodeList.size();i++){
             if(pathNodeList.get(i).isAttributeSatisfied(line)) {
                 numerator++;//System.out.println("1");
             }
             else
-                ;//System.out.println("-1");
+                break;//System.out.println("-1");
         }
+        //System.out.println("size"+pathNodeList.size());
+        //System.out.println("dominator"+numerator);
         if(pathNodeList.get(pathNodeList.size()-1).isLabelSatisfied(line))
             return numerator/dominator*1;
         else return numerator/dominator*(-1);
 
-    }*/
+    }
 
-
+/*
     public double caculateScore(String line){
         double dominator = pathNodeList.size();
         double numerator = 0;
@@ -257,20 +273,48 @@ public class RetriveTreePathForTest extends Automatic_Tester {
             if(entry.getValue()>0)
                 numerator ++;
 
+
         }
 
         if(pathNodeList.get(pathNodeList.size()-1).isLabelSatisfied(line))
             return numerator/pathListTogether.size()*1;
         else return numerator/pathListTogether.size()*(-1);
 
-    }
+    }*/
     public int int_RandomExcept(int except){
         int value = (int)(Math.random()*labelRange);
         while(value == except){
             value = (int)(Math.random()*labelRange);
         }
-
         return value;
+
+    }
+    public double double_RandomExcept(ArrayList<Double> list, double except){
+        int number = 0;
+        for(int i=0;i<list.size();i++) {
+            if (Math.abs(list.get(i) - except)< 1e-5)
+                continue;
+            else
+                number++;
+        }
+        System.out.println("number:"+number);
+        System.out.println("except:"+except);
+        int rand = (int)(Math.random()*number);
+        System.out.println("rand:"+rand);
+        int select = 0;
+        int i;
+        for(i=0;i<list.size();i++) {
+            if (Math.abs(list.get(i) - except) < 1e-5)
+                continue;
+            else{
+                if(rand==select)
+                    return list.get(i);
+                else
+                    select ++;
+            }
+        }
+        //System.out.println("select:"+select);
+        return 0.0;
     }
     public String replaceAttributeValue(String[] parts, int loc, int value){
         parts[loc] = value+"";
@@ -363,8 +407,74 @@ public class RetriveTreePathForTest extends Automatic_Tester {
         result = result + parts[parts.length-1];
         return result;
     }
-    @Override
-    protected String modifyLine(String trainLine, int modify_type) {
+    //@Override
+    protected String modifyLine(String trainLine, int modify_type) throws IOException {
+        String[] parts = trainLine.split(",");
+        String resultLine = "";
+        if(modify_type==0){//0: positive->negative
+            String testLine = testLineBase;
+            String[] test_parts = testLine.split(",");
+            for(int i=0;i<test_parts.length-1;i++){
+                resultLine = resultLine+test_parts[i]+",";
+            }
+            resultLine = resultLine+ int_RandomExcept(predict_Array);
+        }
+
+        else if(modify_type==1){//1: positive->irrelevant
+
+            resultLine = generateMinInstance(parts);
+
+        }
+
+        else if(modify_type==2){//2: negative->positive
+            String testLine = testLineBase;
+            String[] test_parts = testLine.split(",");
+            for(int i=0;i<test_parts.length-1;i++){
+                resultLine = resultLine+test_parts[i]+",";
+            }
+            resultLine = resultLine+ predict_Array;
+        }
+
+        else if(modify_type==3){//3: negative->irrelevant
+            resultLine = generateMinInstance(parts);
+        }
+
+        else if(modify_type==4){//4: irrelevant->positive
+
+            resultLine = generateMaxInstance(parts);
+            resultLine = modifyLine(resultLine,2);
+        }
+
+        else if(modify_type==5){//5: irrelevant->negative
+            resultLine = generateMaxInstance(parts);
+            resultLine = modifyLine(resultLine,0);
+        }
+        else if(modify_type==-1) {//-1: generate positive 100%
+            String testLine = testLineBase;
+            String[] test_parts = testLine.split(",");
+            for(int i=0;i<parts.length-1;i++){
+                resultLine = resultLine+test_parts[i]+",";
+            }
+            resultLine = resultLine+ predict_Array;
+        }
+        else if(modify_type==-2){//-1: generate negative 100%
+            String testLine = testLineBase;
+            String[] test_parts = testLine.split(",");
+            for(int i=0;i<parts.length-1;i++){
+                resultLine = resultLine+test_parts[i]+",";
+            }
+            resultLine = resultLine+ int_RandomExcept(predict_Array);
+        }
+        System.out.println(trainLine+"--->"+resultLine);
+        return resultLine;
+    }
+
+    //@Override
+    protected String modifyLineGenerate(String trainLine, int modify_type) throws IOException {
+    /*modify_timestamp: 20161215;modifyLineGenerate: each time we modify according to their proporation and control type, but donot control
+        to generate 100% positive(similarity:+1) or 100% negative(similarity:-1).
+        when need to generate more target type than source, we select its type from history
+        */
         String[] parts = trainLine.split(",");
         String resultLine = "";
         if(modify_type==0){//0: positive->negative
@@ -401,6 +511,7 @@ public class RetriveTreePathForTest extends Automatic_Tester {
             resultLine = generateMaxInstance(parts);
             resultLine = modifyLine(resultLine,0);
         }
+
         //System.out.println(trainLine+"--->"+resultLine);
         return resultLine;
     }
@@ -408,48 +519,120 @@ public class RetriveTreePathForTest extends Automatic_Tester {
     public String modifyLineSolver(ArrayList<TreeNodeExpression> conditionList){
         return null;
     }
-    /*public static void main(String[] args) throws IOException {
 
-        String trainFile = "E:\\MT1\\MutantTest3\\20trainAll.arff";
-        String testFile = "E:\\MT1\\MutantTest3\\20testAll.arff";
-        String treeFile = "E:\\MT1\\MutantTest3\\tree.txt";
 
-        int testNumber = 5;
-        int modify_type = 5;
-        int modify_strength = 50;
+    public String generateFullScoreInstance(ArrayList<TreeNodeExpression> treeNodeList, int pos_Neg){
+    //In order to generate a full score instance for negative or positive when feeding a certain testing instance
+    //may return an exactly same instance as the testing instance, but mostly different but with 100% pos/Neg
 
-        RetriveTreePathForTest retriver = new RetriveTreePathForTest(trainFile,testFile,treeFile);
-        //System.out.println(retriver.getTest(4));
-        retriver.displayList(retriver.getPathList(testNumber));
-
-        //System.out.println();
-        //System.out.println("Score"+retriver.caculateScore("0,9,9,0,0,0,9,0,0,1"));
-
-        retriver.read_Train_Data(trainFile);
-
-        //double max = retriver.getMaxScore();
-        //double min = retriver.getMinScore();
-        if(modify_type==1||modify_type==3) {
-            if(retriver.isGeneratable()){
-                retriver.modifyFile(trainFile,modify_type,modify_strength);
-            }
-            else
-                System.out.println("Cannot be generated!");
+        ArrayList<ArrayList<Double>> candidateList = new ArrayList<ArrayList<Double>>();
+        //initial candidate pools
+        for(int i=0;i<9;i++){
+            ArrayList<Double> temp = new ArrayList<>();
+            for(int j=0;j<attriRange;j++)
+                temp.add(j, Double.valueOf(j));
+            candidateList.add(temp);
         }
-        else
-            retriver.modifyFile(trainFile,modify_type,modify_strength);
-        retriver.read_Train_Data("E:\\MT1\\MutantTest3\\20trainAll_after1.arff");
+        ArrayList<Double> temp = new ArrayList<>();
+        for(int j=0;j<labelRange;j++)
+            temp.add(j, Double.valueOf(j));
+        candidateList.add(temp);
 
-    }*/
+        //System.out.println(candidateList.toString());
+
+        for(int num = 0;num<treeNodeList.size();num++){
+            TreeNodeExpression condition = treeNodeList.get(num);
+            String attribute = condition.getAttributeName();
+            String operator = condition.getOperator();
+            String split = condition.getValueSplit();
+            //System.out.println(attribute+" "+operator+" "+split);
+            if(attribute.isEmpty())
+                continue;
+            if(operator.equals("<")){
+                ArrayList<Double> attr_candidates = candidateList.get(Integer.parseInt(attribute));
+                for(int i = 0;i<attr_candidates.size();i++){
+                    if(attr_candidates.get(i)<Double.parseDouble(split))//"<",满足条件的留着
+                        continue;
+                    else
+                        attr_candidates.set(i,Double.valueOf(-1));
+                }
+            }
+            else if(operator.equals("<=")){
+                ArrayList<Double> attr_candidates = candidateList.get(Integer.parseInt(attribute));
+                for(int i = 0;i<attr_candidates.size();i++){
+                    if(attr_candidates.get(i)<Double.parseDouble(split)||Math.abs(attr_candidates.get(i)-Double.parseDouble(split))<1e-5)//"<=",满足条件的留着
+                        continue;
+                    else
+                        attr_candidates.set(i,Double.valueOf(-1));
+                }
+            }
+            else if(operator.equals("=")){
+                ArrayList<Double> attr_candidates = candidateList.get(Integer.parseInt(attribute));
+                for(int i = 0;i<attr_candidates.size();i++){
+                    if(Math.abs(attr_candidates.get(i)-Double.parseDouble(split))<1e-5)//"=",满足条件的留着
+                        continue;
+                    else
+                        attr_candidates.set(i,Double.valueOf(-1));
+                }
+            }
+            else if(operator.equals(">")) {
+                ArrayList<Double> attr_candidates = candidateList.get(Integer.parseInt(attribute));
+                for(int i = 0;i<attr_candidates.size();i++){
+                    if(attr_candidates.get(i)>Double.parseDouble(split))//">",满足条件的留着
+                        continue;
+                    else
+                        attr_candidates.set(i,Double.valueOf(-1));
+                }
+            }
+            else if(operator.equals(">=")){
+                ArrayList<Double> attr_candidates = candidateList.get(Integer.parseInt(attribute));
+                for(int i = 0;i<attr_candidates.size();i++){
+                    if(attr_candidates.get(i)>Double.parseDouble(split)||Math.abs(attr_candidates.get(i)-Double.parseDouble(split))<1e-5)//">=",满足条件的留着
+                        continue;
+                    else
+                        attr_candidates.set(i,Double.valueOf(-1));
+                }
+
+            }
+           // System.out.println(candidateList.toString());
+
+        }
+
+
+        //System.out.println(candidateList.toString());
+
+        String result = "";
+        for(int i=0;i<candidateList.size()-1;i++){
+
+            ArrayList<Double> attr_candidates = candidateList.get(i);
+            result = result + (int)double_RandomExcept(attr_candidates,-1)+",";
+
+        }
+        if( pos_Neg == 0 ){//To generate hundred precent negtive instance
+            ArrayList<Double> label_candidates = candidateList.get(candidateList.size()-1);
+            System.out.println(label_candidates.toString());
+            result = result + (int)double_RandomExcept(label_candidates,Double.parseDouble(treeNodeList.get(treeNodeList.size()-1).getLabel()));
+        }
+        else if( pos_Neg == 2 ){
+            //To generate hundred precent negtive instance
+            result = result + Integer.parseInt(treeNodeList.get(treeNodeList.size()-1).getLabel());
+        }
+        //System.out.println("score:"+caculateScore(result));
+        System.out.println("result:"+result);
+        return result;
+    }
+
     public static void main(String[] args) throws IOException {
 
-        String trainFile = args[0];
-        String testFile = args[1];//"E:\\MT1\\MutantTest3\\20testAll.arff";
-        String treeFile = args[2];//"E:\\MT1\\MutantTest3\\tree.txt";
+        //int fileNumber = 1;
 
-        int testNumber = Integer.parseInt(args[3]);
-        int modify_type = Integer.parseInt(args[4]);
-        int modify_strength = Integer.parseInt(args[5]);
+        String trainFile = "E:\\Dataset\\1trainAll.arff";
+        String testFile = "E:\\Dataset\\1testAll.arff";
+        String treeFile = "E:\\Dataset\\1\\1tree.txt";
+
+        int testNumber = 1;
+        int modify_type = 1;
+        int modify_strength = 10;
 
         if(modify_type == -1 && modify_strength == -1){
             RetriveTreePathForTest retriver = new RetriveTreePathForTest(trainFile,testFile,treeFile);
@@ -544,15 +727,21 @@ public class RetriveTreePathForTest extends Automatic_Tester {
         else {
             RetriveTreePathForTest retriver = new RetriveTreePathForTest(trainFile,testFile,treeFile);
             //retriver.displayList(retriver.getPathList(testNumber));
-            retriver.getPathList(testNumber);
-            //System.out.println();
+            //retriver.getPathList(testNumber);
+
+            retriver.displayList(retriver.getPathList(testNumber));
+
+
+            System.out.println();
+
+            retriver.generateFullScoreInstance(retriver.getPathNodeList(),0);
             //System.out.println("Score"+retriver.caculateScore("0,9,9,0,0,0,9,0,0,1"));
 
             retriver.read_Train_Data(trainFile);
 
             //double max = retriver.getMaxScore();
             //double min = retriver.getMinScore();
-            if(modify_type==1||modify_type==3) {
+            /*if(modify_type==1||modify_type==3) {
                 if(retriver.isGeneratable()){
                     retriver.modifyFile(trainFile,modify_type,modify_strength);
                 }
@@ -560,11 +749,45 @@ public class RetriveTreePathForTest extends Automatic_Tester {
                     System.out.println("Cannot be generated!");
             }
             else
-                retriver.modifyFile(trainFile,modify_type,modify_strength);
+                retriver.modifyFile(trainFile,modify_type,modify_strength);*/
             //retriver.read_Train_Data("E:\\MT1\\MutantTest3\\20trainAll_after1.arff");
 
         }
         //System.out.println(retriver.getTest(4));
 
     }
+
+    /*public static void main(String[] args) throws IOException {
+
+        String trainFile = "E:\\MT1\\MutantTest3\\20trainAll.arff";
+        String testFile = "E:\\MT1\\MutantTest3\\20testAll.arff";
+        String treeFile = "E:\\MT1\\MutantTest3\\tree.txt";
+
+        int testNumber = 5;
+        int modify_type = 5;
+        int modify_strength = 50;
+
+        RetriveTreePathForTest retriver = new RetriveTreePathForTest(trainFile,testFile,treeFile);
+        //System.out.println(retriver.getTest(4));
+        retriver.displayList(retriver.getPathList(testNumber));
+
+        //System.out.println();
+        //System.out.println("Score"+retriver.caculateScore("0,9,9,0,0,0,9,0,0,1"));
+
+        retriver.read_Train_Data(trainFile);
+
+        //double max = retriver.getMaxScore();
+        //double min = retriver.getMinScore();
+        if(modify_type==1||modify_type==3) {
+            if(retriver.isGeneratable()){
+                retriver.modifyFile(trainFile,modify_type,modify_strength);
+            }
+            else
+                System.out.println("Cannot be generated!");
+        }
+        else
+            retriver.modifyFile(trainFile,modify_type,modify_strength);
+        retriver.read_Train_Data("E:\\MT1\\MutantTest3\\20trainAll_after1.arff");
+
+    }*/
 }

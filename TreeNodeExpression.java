@@ -50,27 +50,28 @@ public class TreeNodeExpression {
             return true;
         String valuetest = parts[Integer.parseInt(attributeName)];
         if(operator.equals("<")){
-            if(Integer.parseInt(valuetest)<Integer.parseInt(valueSplit))
+            if(Double.parseDouble(valuetest)<Double.parseDouble(valueSplit))
                 return true;
             else return false;
         }
         else if(operator.equals("<=")){
-            if(Integer.parseInt(valuetest)<=Integer.parseInt(valueSplit))
+            if(Double.parseDouble(valuetest)<=Double.parseDouble(valueSplit))
                 return true;
             else return false;
         }
         else if(operator.equals("=")){
-            if(Integer.parseInt(valuetest)==Integer.parseInt(valueSplit))
+            if(Double.parseDouble(valuetest)==Double.parseDouble(valueSplit)
+                    ||Double.parseDouble(valuetest)-Double.parseDouble(valueSplit)<1e-5)
                 return true;
             else return false;
         }
         else if(operator.equals(">")){
-            if(Integer.parseInt(valuetest)>Integer.parseInt(valueSplit))
+            if(Double.parseDouble(valuetest)>Double.parseDouble(valueSplit))
                 return true;
             else return false;
         }
         else if(operator.equals(">=")){
-            if(Integer.parseInt(valuetest)>=Integer.parseInt(valueSplit))
+            if(Double.parseDouble(valuetest)>=Double.parseDouble(valueSplit))
                 return true;
             else return false;
         }
@@ -80,6 +81,9 @@ public class TreeNodeExpression {
     public String getAttributeName() {
         return attributeName;
     }
+    public String getOperator(){return operator;}
+    public String getValueSplit(){return valueSplit;}
+    public String getLabel(){return label;}
     public boolean isLabelSatisfied(String line){
         String[] parts = line.split(",");
         String labeltest = parts[parts.length-1];
