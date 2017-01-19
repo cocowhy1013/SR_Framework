@@ -187,14 +187,46 @@ public class SplitTestsFileToSingleTest {
             }
         }
     }
+    public static void splitIntoTrainAndSingleTest(String source,int num) throws IOException {
+        File sourceFile = new File(source);
+        if(!sourceFile.exists())
+            return;
+        List<String> list = FileUtils.readLines(sourceFile);
+        File targetTrain = new File(source.replace("trainAll",num+"trainAll"));
+        File targetTest = new File(source.replace("trainAll",num+"testAll"));
+        FileUtils.writeStringToFile(targetTrain, "",false);
+        FileUtils.writeStringToFile(targetTest, "",false);
+        //int flag = 0;
+        int temp = 0;
+        for(int i=0;i<list.size();i++){
+            String line = list.get(i);
+            //if(flag == 0){
+            FileUtils.writeStringToFile(targetTrain, line+"\n",true);
+            FileUtils.writeStringToFile(targetTest, line+"\n",true);
+           // }
+            if(line.contains("@data")) {
+                //flag = 1;
+                temp = i;
+                break;
+            }
+        }
+        for(int j = temp+1; j<list.size();j++){
+            String line = list.get(j);
+            if(j-temp == num)
+                FileUtils.writeStringToFile(targetTest, line+"\n",true);
+            else
+                FileUtils.writeStringToFile(targetTrain, line+"\n",true);
+        }
+    }
     public static void main(String [] args) throws IOException {
-
+        for(int num = 1; num<4177; num++)
+            splitIntoTrainAndSingleTest("E:\\MT1\\UCI_data\\Split\\Abalone\\Abalone_trainAll.arff",num);
         //splitTestFiles("E:\\MT\\dataset\\dataset_NBC\\20");
         //for(int i=22;i<205;i++)
         //    FileUtil.createDir("E:\\MT\\dataset\\dataset_NBC\\20\\"+i);
-            String root = "E:\\MTfinishMR2_20part4\\20";// = "F:\\MTfinish\\10";
-        batGen_BeforeModified(root);
-        batGen_ARFFtoPredict(root);
+          //  String root = "E:\\MTfinishMR2_20part4\\20";// = "F:\\MTfinish\\10";
+        //batGen_BeforeModified(root);
+        //batGen_ARFFtoPredict(root);
         //splitTestFiles(root);
        // root = "E:\\MTfinishMR2\\10";
        // batGen_BeforeModified(root);

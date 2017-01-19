@@ -92,19 +92,19 @@ public class CompareMutantWithOracleAccuracy {
 
         //System.out.println(returnFiles("E:\\MT1\\Result_ChangeTest\\MutantManual\\C45ModelSelection").size());
         //System.out.println(returnFiles("E:\\MT1\\Result_ChangeTest\\MutantManual\\C45ModelSelection").toString());
-        String root = "E:\\MT1\\Result_ChangeTest\\MUTANTresult\\PIT\\Stats";
+        String root = "E:\\Dataset\\manualMutants\\selectTest\\EntropyBasedSplitCrit\\5";
         //File oracle = new File("E:\\MT1\\SameChangeTest21\\oracle.txt");
-        File target = new File("E:\\MT1\\Result_ChangeTest\\MUTANTresult\\PIT\\Stats\\predictResult.csv");
-        classNumberConvertMethod(root+"\\Stats_classNumber.txt");
+        File target = new File("E:\\Dataset\\manualMutants\\selectTest\\EntropyBasedSplitCrit\\5\\predictResult.csv");
+        //classNumberConvertMethod(root+"\\C45ModelSelection_classNumber.txt");
 
         FileUtils.writeStringToFile(target,"",false);
         for(int i=-1;i<1000;i++){
-            File file = new File(root+"\\"+"Stats_predict_"+i+".txt");
+            File file = new File(root+"\\"+"EntropyBasedSplitCrit"+i+"_predict_5.txt");
             if(file.exists()){
                 //System.out.println(file.getName());
                 //System.out.println("Compare whole output: "+compare(file,oracle));
                 //System.out.println("Oracle precision: "+(1-precision(oracle)/200.0));
-                //System.out.println("Mutant precision: "+(1-precision(file)/200.0));
+                //System.out.println(""+(1-precision(file)/200.0));
                 FileUtils.writeStringToFile(target,file.getName()+","+(1-precision(file)/200.0)+"\n",true);
 
                 System.out.println(1-precision(file)/200.0);

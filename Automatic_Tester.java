@@ -38,6 +38,7 @@ public abstract class Automatic_Tester {
         List<String> lines= FileUtils.readLines(new File(trainFilePath));
         score_List = new ArrayList<Double>();
         int flag = 0;
+        System.out.println("score");
         for(int i=0;i<lines.size();i++){
             if(lines.get(i).contains("@")||lines.get(i).isEmpty())
                 continue;
@@ -47,7 +48,8 @@ public abstract class Automatic_Tester {
                 flag = 1;
             }
             double score = caculateScore(lines.get(i));
-            //System.out.println(score);
+
+            System.out.println(score);
             score_List.add(score);
 
         }
@@ -93,6 +95,33 @@ public abstract class Automatic_Tester {
         //for(int i=0;i<size;i++)
         //    System.out.print(array[i]+"| ");
         return array;
+    }
+    public void modifyFileCertain(String trainFilePath, int modify_type, int modify_certainID) throws IOException {
+        List<String> lines= FileUtils.readLines(new File(trainFilePath));
+        int temp = 0;
+        int flag = 0;
+        for (int i = 0; i < lines.size(); i++) {
+            if (lines.get(i).contains("@") || lines.get(i).isEmpty())
+                continue;
+            temp ++;
+            if(temp == modify_certainID) {
+                double score = caculateScore(lines.get(i));
+                /*if(score-0<1e-5&&modify_type==0){
+                    lines.set(i, modifyLine(lines.get(i), modify_type));
+                    flag = 1;
+                }*/
+                if(score>=0&&modify_type==0) {
+                    lines.set(i, modifyLine(lines.get(i), modify_type));
+                    flag = 1;
+                }
+                else if(score<0&&modify_type==2) {
+                    lines.set(i, modifyLine(lines.get(i), modify_type));
+                    flag = 1;
+                }
+            }
+        }
+        if(flag == 1)
+            FileUtils.writeLines(new File(trainFilePath.replace(".arff","certain"+modify_certainID+"_after.arff")),lines,false);
     }
     public void modifyFile(String trainFilePath, int modify_type,int modify_strength) throws IOException {
        /* 0: positive->negative
