@@ -715,17 +715,17 @@ public class RetriveTreePathForTest extends Automatic_Tester {
     }
 
     public double caculateScore(String line){
-        //return caculateScoreConditionCoverNoMerge(line);
-        return caculateScorePathCover(line);
+        return caculateScoreConditionCoverNoMerge(line);
+        //return caculateScorePathCover(line);
         //return caculateScoreConditionCoverMerge(line);
     }
     public static void main(String[] args) throws IOException {
 
         //int fileNumber = 1;
 
-        String trainFile = "E:\\Dataset\\miniStudy\\Golden\\PathCover\\GeneInsQ\\1trainAll.arff";
-        String testFile = "E:\\Dataset\\miniStudy\\Golden\\PathCover\\GeneInsQ\\1testAll.arff";
-        String treeFile = "E:\\Dataset\\miniStudy\\Golden\\PathCover\\GeneInsQ\\treeG.txt";
+        String trainFile = "E:\\Dataset\\miniStudy\\Mutant\\M4\\ConditionCover\\GeneInsQ\\1trainAll.arff";
+        String testFile = "E:\\Dataset\\miniStudy\\Mutant\\M4\\ConditionCover\\GeneInsQ\\1testAll.arff";
+        String treeFile = "E:\\Dataset\\miniStudy\\Mutant\\M4\\ConditionCover\\GeneInsQ\\treeM.txt";
 
         int testNumber = 1;
         int modify_type =2;
@@ -826,26 +826,30 @@ public class RetriveTreePathForTest extends Automatic_Tester {
             //retriver.displayList(retriver.getPathList(testNumber));
             //retriver.getPathList(testNumber);
 
+            int step = 2;
+
             System.out.print("test:");
             retriver.displayList(retriver.getPathList(testNumber));
 
-            /*for(int i=1;i<=2000;i++) {
-                //System.out.print(i+",");
-                retriver.displayList(retriver.getPathListIns(RandomDataFile.selectIns(trainFile, i)));
-            }
-            System.out.println();*/
-
+            /*if(step == 1) {
+                for (int i = 1; i <= 2000; i++) {
+                    //System.out.print(i+",");
+                    retriver.displayList(retriver.getPathListIns(RandomDataFile.selectIns(trainFile, i)));
+                }
+                System.out.println();
+            }*/
             //retriver.generateFullScoreInstance(retriver.getPathNodeList(),0);
             //System.out.println("Score"+retriver.caculateScore("0,9,9,0,0,0,9,0,0,1"));
 
             retriver.read_Train_Data(trainFile);
 
-            for(int i=1;i<=2000;i++)
-                retriver.modifyFileCertain(trainFile,2,i);
+            if(step == 2) {
+                for (int i = 1; i <= 2000; i++)
+                    retriver.modifyFileCertain(trainFile, 2, i);
 
-            for(int i=1;i<=2000;i++)
-                retriver.modifyFileCertain(trainFile,0,i);
-
+                for (int i = 1; i <= 2000; i++)
+                    retriver.modifyFileCertain(trainFile, 0, i);
+            }
             //double max = retriver.getMaxScore();
             //double min = retriver.getMinScore();
             /*if(modify_type==1||modify_type==3) {

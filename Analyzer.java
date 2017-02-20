@@ -96,6 +96,6 @@ public class Analyzer {
         //int i = new J48weka_analyzer().returnPredictValue("E:\\MT1\\" +
         //        "wekaRunner\\predict_5_5_31.txt");
         //System.out.println(i);
-        new Analyzer().returnPredictALLFiles("E:\\Dataset\\miniStudy\\Mutant\\M3\\PathCover\\TestInsQ\\result");
+        new Analyzer().returnPredictALLFiles("E:\\Dataset\\miniStudy\\Mutant\\M8\\PathCover\\TestInsQ\\result");
     }
 }
