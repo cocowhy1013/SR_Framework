@@ -40,13 +40,22 @@ public class Analyzer {
     }
     public void returnPredictALLFiles(String root) throws IOException {
         File rootFile = new File(root);
-        for(int i=1;i<=2000;i++){
-            File file = new File(root+"\\predictAllcertain"+i+".txt");
-            if(file.exists()){
-                System.out.println(returnPredictValue2(file));
+        for(int i=0;i<=5000;i++){
+            if(i==0){
+                File file = new File(root+"\\predict.txt");
+                if(file.exists()){
+                    System.out.println("expect: "+returnPredictValue2(file));
+                }
+                else
+                    System.out.println("no result");
             }
-            else
-                System.out.println("no result");
+            else {
+                File file = new File(root + "\\predictAllcertain" + i + ".txt");
+                if (file.exists()) {
+                    System.out.println(returnPredictValue2(file));
+                } else
+                    ;//System.out.println("no result");
+            }
         }
     }
     public int returnPredictValue2(File resultFile) throws IOException {
@@ -96,6 +105,6 @@ public class Analyzer {
         //int i = new J48weka_analyzer().returnPredictValue("E:\\MT1\\" +
         //        "wekaRunner\\predict_5_5_31.txt");
         //System.out.println(i);
-        new Analyzer().returnPredictALLFiles("E:\\Dataset\\miniStudy\\Mutant\\M8\\PathCover\\TestInsQ\\result");
+        new Analyzer().returnPredictALLFiles("E:\\Dataset\\miniStudy\\Mutant\\M2\\PathCover\\TestInsQ\\result");
     }
 }

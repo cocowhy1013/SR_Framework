@@ -65,9 +65,9 @@ public class LogResultAnalyzer {
         }
     }
     public static void main(String [] args) throws IOException {
-        String[] rootList = {"E:\\MT1\\UCI_data\\Result\\Abalone\\detail"};
+        String[] rootList = {"E:\\MT1\\UCI_data\\Result\\Abalone_golden3_1_10"};
         LogResultAnalyzer analyzer = new LogResultAnalyzer(
-                "E:\\MT1\\UCI_data\\Result\\Abalone\\detail\\final.csv"
+                "E:\\MT1\\UCI_data\\Result\\Abalone_golden3_1_10\\final.csv"
         ,rootList);
        analyzer.rootProcessor();
        //analyzer.resultFileProcessor("E:\\MT1\\wekaRunner\\FileTest\\result1.txt");

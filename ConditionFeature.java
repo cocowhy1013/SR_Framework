@@ -37,9 +37,11 @@ public class ConditionFeature {
     public double getMax(){
         return max;
     }
+    public boolean getMaxIncluded(){ return isMax_Include;}
     public double getMin(){
         return min;
     }
+    public boolean getMinIncluded(){ return isMin_Include;}
     public String toString(){
         String result = "";
         if(isMin_Include)

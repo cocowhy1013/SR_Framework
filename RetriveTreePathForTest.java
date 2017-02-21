@@ -607,7 +607,7 @@ public class RetriveTreePathForTest extends Automatic_Tester {
     }
 
 
-    public String generateFullScoreInstance(ArrayList<TreeNodeExpression> treeNodeList, int pos_Neg){
+    public String generateFullScoreInstanceInteger(ArrayList<TreeNodeExpression> treeNodeList, int pos_Neg){
     //In order to generate a full score instance for negative or positive when feeding a certain testing instance
     //may return an exactly same instance as the testing instance, but mostly different but with 100% pos/Neg
 
@@ -708,9 +708,16 @@ public class RetriveTreePathForTest extends Automatic_Tester {
         System.out.println("result:"+result);
         return result;
     }
+    public String generateFullScoreInstance(ArrayList<TreeNodeExpression> treeNodeList, int pos_Neg){
+        GenePoolForTargetInstace pool = new GenePoolForTargetInstace();
+        int [] a = {1,0,0,0,0,0,0,0,1};
+        String result = pool.generateFullScoreInstance(treeNodeList,trainfile,pos_Neg,a);
+        return result;
+    }
+
     protected String modifyLine(String trainLine, int modify_type) throws IOException {
-        return modifyLineNewHighQuality(trainLine, modify_type);
-        //return modifyLineHighQuality(trainLine, modify_type);
+        //return modifyLineNewHighQuality(trainLine, modify_type);
+        return modifyLineHighQuality(trainLine, modify_type);
         //return modifyLineGenerate(trainLine, modify_type);
     }
 
@@ -722,13 +729,12 @@ public class RetriveTreePathForTest extends Automatic_Tester {
     public static void main(String[] args) throws IOException {
 
         //int fileNumber = 1;
-
-        String trainFile = "E:\\Dataset\\miniStudy\\Mutant\\M4\\ConditionCover\\GeneInsQ\\1trainAll.arff";
-        String testFile = "E:\\Dataset\\miniStudy\\Mutant\\M4\\ConditionCover\\GeneInsQ\\1testAll.arff";
-        String treeFile = "E:\\Dataset\\miniStudy\\Mutant\\M4\\ConditionCover\\GeneInsQ\\treeM.txt";
+        String trainFile = "E:\\Dataset\\miniStudy\\Mutant\\M2\\ConditionCover\\TestInsQ\\1trainAll.arff";
+        String testFile = "E:\\Dataset\\miniStudy\\Mutant\\M2\\ConditionCover\\TestInsQ\\1testAll.arff";
+        String treeFile = "E:\\Dataset\\miniStudy\\Mutant\\M2\\ConditionCover\\TestInsQ\\treeM.txt";
 
         int testNumber = 1;
-        int modify_type =2;
+        int modify_type = 2;
         int modify_strength = 10;
 
         if(modify_type == -1 && modify_strength == -1){
@@ -804,8 +810,6 @@ public class RetriveTreePathForTest extends Automatic_Tester {
                         }
                         //System.out.println(j);
                     }
-
-
                 }
             }
 
@@ -831,23 +835,23 @@ public class RetriveTreePathForTest extends Automatic_Tester {
             System.out.print("test:");
             retriver.displayList(retriver.getPathList(testNumber));
 
-            /*if(step == 1) {
-                for (int i = 1; i <= 2000; i++) {
+            if(step == 1) {
+                for (int i = 1; i <= 5000; i++) {
                     //System.out.print(i+",");
                     retriver.displayList(retriver.getPathListIns(RandomDataFile.selectIns(trainFile, i)));
                 }
                 System.out.println();
-            }*/
+            }
             //retriver.generateFullScoreInstance(retriver.getPathNodeList(),0);
             //System.out.println("Score"+retriver.caculateScore("0,9,9,0,0,0,9,0,0,1"));
+            if(step == 2)
+                retriver.read_Train_Data(trainFile);
 
-            retriver.read_Train_Data(trainFile);
-
-            if(step == 2) {
-                for (int i = 1; i <= 2000; i++)
+            if(step == 3) {
+                for (int i = 1; i <= 5000; i++)
                     retriver.modifyFileCertain(trainFile, 2, i);
 
-                for (int i = 1; i <= 2000; i++)
+                for (int i = 1; i <= 5000; i++)
                     retriver.modifyFileCertain(trainFile, 0, i);
             }
             //double max = retriver.getMaxScore();
