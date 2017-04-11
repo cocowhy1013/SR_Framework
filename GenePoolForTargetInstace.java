@@ -62,6 +62,14 @@ public class GenePoolForTargetInstace {
                     case "=":{
                         feature.setMin(Double.parseDouble(node.getValueSplit()),true);
                         feature.setMax(Double.parseDouble(node.getValueSplit()),true);
+
+                        feature.clearAvoid();
+                        feature.addAvoidValue(node.getValueSplit());
+
+                        break;
+                    }
+                    case "!=":{
+                        feature.deleteAvoidValue(node.getValueSplit());
                         break;
                     }
                     case "<":{
@@ -147,9 +155,65 @@ public class GenePoolForTargetInstace {
                     feature.setMax(value,true);
                 conditionPool.put(j+"",feature);
             }
-
         }
         //poolDisplay();
+    }
+    public void scanConfigFile(String trainFileConfig){
+        try {
+            List<String> lines = FileUtils.readLines(new File(trainFileConfig));
+            attribute_num = lines.size()-1;
+            for(int i = 0; i<lines.size();i++){
+                String line = lines.get(i);
+                String[] parts = line.split(" ");
+                String feature_no = parts[0].replace(":","").replace("feature","");
+                String feature_IoDoS = parts[1].replace("IoDoS-[","").replace("]","");
+                /*
+                * add how to explain config description file to get max, min (IoDoS = 0 or 1)
+                * and candidates (IoDoS = 2) for each feature in order
+                * */
+                switch (feature_IoDoS){
+                    case "0": {
+                        ConditionFeature feature = new ConditionFeature();
+                        double min = Double.parseDouble(parts[2].replace("min-[","").replace("]",""));
+                        double max = Double.parseDouble(parts[3].replace("max-[","").replace("]",""));
+
+                        feature.setIoDoS(0);
+                        feature.setMaxAndMin(max,true,min,true);
+                        conditionPool.put(i+"",feature);
+                        break;
+                    }
+                    case "1": {
+                        ConditionFeature feature = new ConditionFeature();
+                        double min = Double.parseDouble(parts[2].replace("min-[","").replace("]",""));
+                        double max = Double.parseDouble(parts[3].replace("max-[","").replace("]",""));
+
+                        feature.setIoDoS(1);
+                        feature.setMaxAndMin(max,true,min,true);
+                        conditionPool.put(i+"",feature);
+                        break;
+                    }
+                    case "2":{
+                        ConditionFeature feature = new ConditionFeature();
+
+                        feature.setIoDoS(2);
+
+                        String list = parts[4].replace("Candidate-[","").replace("]","");
+
+                        String [] can = list.split(",");
+                        for(int j=0; j<can.length;j++){
+                            feature.addAvoidValue(can[j]);
+                        }
+                        feature.setMaxAndMin(-1,true,-1,true);
+                        conditionPool.put(i+"",feature);
+                        break;
+                    }
+                    default:
+                        break;
+                }
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
     }
     public String generateFullScoreInstance(ArrayList<TreeNodeExpression> treeNodeList, String trainFile, int pos_Neg,int[] isInteger){
 
@@ -181,6 +245,25 @@ public class GenePoolForTargetInstace {
         return null;
     }
 
+    public String solveValueUnderSingleCondition2(ConditionFeature feature, int isIoDoS){
+        double max = feature.getMax();
+        double min = feature.getMin();
+        if(isIoDoS==0){//double, not int
+            double a = (Math.random()*(max - min) + min);
+            double result = ((double) ((int)(a * 10000)))/10000.0;
+            return "" + result;
+        }
+        else if(isIoDoS==1){//int
+            if(!feature.getMinIncluded())
+                min = feature.getMin() + 1;
+            if(feature.getMaxIncluded())
+                max = feature.getMax() + 1;
+            return "" + (int)(Math.random()*(max - min) + min);
+        }
+        else{//category
+            return feature.returnSingleCandidate();//return a random candidate
+        }
+    }
     public String solveValueUnderSingleCondition(ConditionFeature feature, boolean isInteger){
         double max = feature.getMax();
         double min = feature.getMin();
@@ -206,15 +289,15 @@ public class GenePoolForTargetInstace {
 
     public static void main(String [] args){
         GenePoolForTargetInstace pool = new GenePoolForTargetInstace();
-        pool.initPathNodeListFromTXT("E:\\path.txt");
+        pool.scanConfigFile("E://Config.txt");
         //pool.processAllNodes();
         pool.poolDisplay();
 
-        GenePoolForTargetInstace pool2 = new GenePoolForTargetInstace();
+        /*GenePoolForTargetInstace pool2 = new GenePoolForTargetInstace();
 
         int [] a = {1,1,1,1,1,1,1,1,1,1};
         String result = pool2.generateFullScoreInstance(pool.pathNodeList,"E:\\Dataset\\1trainAll.arff",0,a);
         System.out.println();
-        System.out.println(result);
+        System.out.println(result);*/
     }
 }

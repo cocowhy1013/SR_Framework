@@ -692,7 +692,7 @@ public class RetriveTreePathForTest extends Automatic_Tester {
         for(int i=0;i<candidateList.size()-1;i++){
 
             ArrayList<Double> attr_candidates = candidateList.get(i);
-            result = result + (int)double_RandomExcept(attr_candidates,-1)+",";
+            result = result + (int)double_RandomExcept(attr_candidates,-1)+",";//
 
         }
         if( pos_Neg == 0 ){//To generate hundred percent negative instance
@@ -716,8 +716,8 @@ public class RetriveTreePathForTest extends Automatic_Tester {
     }
 
     protected String modifyLine(String trainLine, int modify_type) throws IOException {
-        //return modifyLineNewHighQuality(trainLine, modify_type);
-        return modifyLineHighQuality(trainLine, modify_type);
+        return modifyLineNewHighQuality(trainLine, modify_type);
+        //return modifyLineHighQuality(trainLine, modify_type);
         //return modifyLineGenerate(trainLine, modify_type);
     }
 
@@ -728,10 +728,10 @@ public class RetriveTreePathForTest extends Automatic_Tester {
     }
     public static void main(String[] args) throws IOException {
 
-        //int fileNumber = 1;
-        String trainFile = "E:\\Dataset\\miniStudy\\Mutant\\M2\\ConditionCover\\TestInsQ\\1trainAll.arff";
-        String testFile = "E:\\Dataset\\miniStudy\\Mutant\\M2\\ConditionCover\\TestInsQ\\1testAll.arff";
-        String treeFile = "E:\\Dataset\\miniStudy\\Mutant\\M2\\ConditionCover\\TestInsQ\\treeM.txt";
+        //int fileNumber/*- = 1;
+        String trainFile = "E:\\MT1\\UCI_data\\Abalone\\M6\\GeneInsQ\\Abalone_1trainAll.arff";
+        String testFile = "E:\\MT1\\UCI_data\\Abalone\\M6\\GeneInsQ\\Abalone_1testAll.arff";
+        String treeFile = "E:\\MT1\\UCI_data\\Abalone\\M6\\GeneInsQ\\treeM.txt";
 
         int testNumber = 1;
         int modify_type = 2;
@@ -830,7 +830,7 @@ public class RetriveTreePathForTest extends Automatic_Tester {
             //retriver.displayList(retriver.getPathList(testNumber));
             //retriver.getPathList(testNumber);
 
-            int step = 2;
+            int step = 3;
 
             System.out.print("test:");
             retriver.displayList(retriver.getPathList(testNumber));
